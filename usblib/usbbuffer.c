@@ -4,20 +4,20 @@
 //
 // Copyright (c) 2008-2020 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
-// 
+//
 // Texas Instruments (TI) is supplying this software for use solely and
 // exclusively on TI's microcontroller products. The software is owned by
 // TI and/or its suppliers, and is protected under applicable copyright
 // laws. You may not combine this software with "viral" open-source
 // software in order to form a larger program.
-// 
+//
 // THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
 // NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 // A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
 // CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
 // DAMAGES, FOR ANY REASON WHATSOEVER.
-// 
+//
 // This is part of revision 2.2.0.295 of the Tiva USB Library.
 //
 //*****************************************************************************
@@ -58,9 +58,7 @@
 // \return None.
 //
 //*****************************************************************************
-static void
-ScheduleNextTransmission(tUSBBuffer *psBuffer)
-{
+static void ScheduleNextTransmission(tUSBBuffer *psBuffer) {
     uint32_t ui32Packet, ui32Space, ui32Total, ui32Sent;
 
     //
@@ -72,8 +70,7 @@ ScheduleNextTransmission(tUSBBuffer *psBuffer)
     // If we were returned something other than zero, we can write that number
     // of bytes to the lower layer.
     //
-    if(ui32Packet)
-    {
+    if (ui32Packet) {
         //
         // How much contiguous data do we have in the buffer?
         //
@@ -93,8 +90,7 @@ ScheduleNextTransmission(tUSBBuffer *psBuffer)
         // Write the contiguous bytes to the lower layer assuming there is
         // something to send.
         //
-        if(ui32Space)
-        {
+        if (ui32Space) {
             //
             // There is data available to send.  Update our state to indicate
             // the amount we will be sending in this packet.
@@ -112,18 +108,15 @@ ScheduleNextTransmission(tUSBBuffer *psBuffer)
             // transmits it.
             //
             psBuffer->pfnTransfer(psBuffer->pvHandle,
-                              (psBuffer->sPrivateData.sRingBuf.pui8Buf +
-                               psBuffer->sPrivateData.sRingBuf.ui32ReadIndex),
-                               ui32Space,
-                              (((ui32Space < ui32Packet) &&
-                                (ui32Space < ui32Total)) ? false : true));
+                                  (psBuffer->sPrivateData.sRingBuf.pui8Buf + psBuffer->sPrivateData.sRingBuf.ui32ReadIndex),
+                                  ui32Space,
+                                  (((ui32Space < ui32Packet) && (ui32Space < ui32Total)) ? false : true));
 
             //
             // Do we need to send a second part to fill out the packet?  This
             // will occur if the current packet spans the buffer wrap.
             //
-            if((ui32Space < ui32Packet) && (ui32Space < ui32Total))
-            {
+            if ((ui32Space < ui32Packet) && (ui32Space < ui32Total)) {
                 //
                 // The packet straddled the wrap.  How much space remains in
                 // the packet?
@@ -136,28 +129,20 @@ ScheduleNextTransmission(tUSBBuffer *psBuffer)
                 ui32Space = ui32Total - ui32Space;
                 ui32Space = (ui32Space > ui32Packet) ? ui32Packet : ui32Space;
 
-                psBuffer->pfnTransfer(psBuffer->pvHandle,
-                                      psBuffer->sPrivateData.sRingBuf.pui8Buf,
-                                      ui32Space, true);
+                psBuffer->pfnTransfer(psBuffer->pvHandle, psBuffer->sPrivateData.sRingBuf.pui8Buf, ui32Space, true);
             }
-        }
-        else
-        {
+        } else {
             //
             // There is no data to send.  Did we last send a full packet?
             //
-            if(psBuffer->sPrivateData.ui32LastSent == ui32Packet)
-            {
+            if (psBuffer->sPrivateData.ui32LastSent == ui32Packet) {
                 //
                 // Yes - if necessary, send a zero-length packet back to the
                 // host to complete the last transaction.
                 //
-                if(psBuffer->sPrivateData.ui32Flags & USB_BUFFER_FLAG_SEND_ZLP)
-                {
+                if (psBuffer->sPrivateData.ui32Flags & USB_BUFFER_FLAG_SEND_ZLP) {
                     psBuffer->sPrivateData.ui32LastSent = 0;
-                    psBuffer->pfnTransfer(psBuffer->pvHandle,
-                                      psBuffer->sPrivateData.sRingBuf.pui8Buf,
-                                      0, true);
+                    psBuffer->pfnTransfer(psBuffer->pvHandle, psBuffer->sPrivateData.sRingBuf.pui8Buf, 0, true);
                 }
             }
         }
@@ -190,22 +175,17 @@ ScheduleNextTransmission(tUSBBuffer *psBuffer)
 // \return Returns the number of bytes read from the lower layer.
 //
 //*****************************************************************************
-static uint32_t
-HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
-{
+static uint32_t HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data) {
     uint32_t ui32Avail, ui32Read, ui32Packet, ui32RetCount;
 
     //
     // Has the data already been read into memory?
     //
-    if(pui8Data)
-    {
+    if (pui8Data) {
         //
         // Yes - is it already in our ring buffer?
         //
-        if((pui8Data >= psBuffer->pui8Buffer) &&
-           (pui8Data < psBuffer->pui8Buffer + psBuffer->ui32BufferSize))
-        {
+        if ((pui8Data >= psBuffer->pui8Buffer) && (pui8Data < psBuffer->pui8Buffer + psBuffer->ui32BufferSize)) {
             //
             // The data is already in our ring buffer so merely update the
             // write pointer to add the new data.
@@ -217,9 +197,7 @@ HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
             // doesn't need to make any buffer pointer updates.
             //
             ui32RetCount = 0;
-        }
-        else
-        {
+        } else {
             //
             // The data is not within our buffer so we need to copy it into
             // the buffer.
@@ -236,8 +214,7 @@ HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
             //
             // Copy the data into the buffer.
             //
-            USBRingBufWrite(&psBuffer->sPrivateData.sRingBuf, pui8Data,
-                            ui32Read);
+            USBRingBufWrite(&psBuffer->sPrivateData.sRingBuf, pui8Data, ui32Read);
 
             //
             // We need to return the number of bytes we read in this case
@@ -246,9 +223,7 @@ HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
             //
             ui32RetCount = ui32Read;
         }
-    }
-    else
-    {
+    } else {
         //
         // We were passed a NULL pointer so the low level driver has not read
         // the data into memory yet.  We need to call the transfer function to
@@ -267,23 +242,21 @@ HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
         // Get as much of the packet as we can in the available space.
         //
         ui32Read = psBuffer->pfnTransfer(psBuffer->pvHandle,
-                              (psBuffer->sPrivateData.sRingBuf.pui8Buf +
-                               psBuffer->sPrivateData.sRingBuf.ui32WriteIndex),
-                              ui32Avail, true);
+                                         (psBuffer->sPrivateData.sRingBuf.pui8Buf + psBuffer->sPrivateData.sRingBuf.ui32WriteIndex),
+                                         ui32Avail,
+                                         true);
 
         //
         // Advance the ring buffer write pointer to add our new data.
         //
-        if(ui32Read)
-        {
+        if (ui32Read) {
             USBRingBufAdvanceWrite(&psBuffer->sPrivateData.sRingBuf, ui32Read);
         }
 
         //
         // Did we get the whole packet?
         //
-        if(ui32Read < ui32Packet)
-        {
+        if (ui32Read < ui32Packet) {
             //
             // No - how much space do we have in the buffer?
             //
@@ -293,22 +266,19 @@ HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
             // If there is any space left, read as much of the remainder of
             // the packet as we can.
             //
-            if(ui32Avail)
-            {
+            if (ui32Avail) {
                 ui32Packet =
                     psBuffer->pfnTransfer(psBuffer->pvHandle,
-                              (psBuffer->sPrivateData.sRingBuf.pui8Buf +
-                               psBuffer->sPrivateData.sRingBuf.ui32WriteIndex),
-                               ui32Avail, true);
+                                          (psBuffer->sPrivateData.sRingBuf.pui8Buf + psBuffer->sPrivateData.sRingBuf.ui32WriteIndex),
+                                          ui32Avail,
+                                          true);
 
                 //
                 // Update the write pointer after we read more data into the
                 // buffer.
                 //
-                if(ui32Packet)
-                {
-                    USBRingBufAdvanceWrite(&psBuffer->sPrivateData.sRingBuf,
-                                           ui32Packet);
+                if (ui32Packet) {
+                    USBRingBufAdvanceWrite(&psBuffer->sPrivateData.sRingBuf, ui32Packet);
                 }
             }
         }
@@ -332,9 +302,9 @@ HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
     // directly from the buffer.
     //
     ui32Read = psBuffer->pfnCallback(psBuffer->pvCBData,
-                             USB_EVENT_RX_AVAILABLE, ui32Avail,
-                             (psBuffer->sPrivateData.sRingBuf.pui8Buf +
-                              psBuffer->sPrivateData.sRingBuf.ui32ReadIndex));
+                                     USB_EVENT_RX_AVAILABLE,
+                                     ui32Avail,
+                                     (psBuffer->sPrivateData.sRingBuf.pui8Buf + psBuffer->sPrivateData.sRingBuf.ui32ReadIndex));
 
     //
     // If the client read anything from the buffer, update the read pointer.
@@ -344,7 +314,7 @@ HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
     //
     // Return the correct value to the low level driver.
     //
-    return(ui32RetCount);
+    return (ui32RetCount);
 }
 
 //*****************************************************************************
@@ -359,17 +329,13 @@ HandleRxAvailable(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t *pui8Data)
 // \return Returns the number of bytes remaining to be processed.
 //
 //*****************************************************************************
-static uint32_t
-HandleDataRemaining(tUSBBuffer *psBuffer)
-{
+static uint32_t HandleDataRemaining(tUSBBuffer *psBuffer) {
     uint32_t ui32BufData, ui32ClientData;
 
     //
     // How much data does the client currently have buffered?
     //
-    ui32ClientData = psBuffer->pfnCallback(psBuffer->pvCBData,
-                                           USB_EVENT_DATA_REMAINING, 0,
-                                           (void *)0);
+    ui32ClientData = psBuffer->pfnCallback(psBuffer->pvCBData, USB_EVENT_DATA_REMAINING, 0, (void *)0);
 
     //
     // How much data do we have in the buffer?
@@ -379,7 +345,7 @@ HandleDataRemaining(tUSBBuffer *psBuffer)
     //
     // Return the total number of bytes of unprocessed data to the lower layer.
     //
-    return(ui32BufData + ui32ClientData);
+    return (ui32BufData + ui32ClientData);
 }
 
 //*****************************************************************************
@@ -398,9 +364,7 @@ HandleDataRemaining(tUSBBuffer *psBuffer)
 // \return Returns the number of bytes remaining to be processed.
 //
 //*****************************************************************************
-static uint32_t
-HandleTxComplete(tUSBBuffer *psBuffer, uint32_t ui32Size)
-{
+static uint32_t HandleTxComplete(tUSBBuffer *psBuffer, uint32_t ui32Size) {
     //
     // Update the transmit buffer read pointer to remove the data that has
     // now been transmitted.
@@ -416,7 +380,7 @@ HandleTxComplete(tUSBBuffer *psBuffer, uint32_t ui32Size)
     //
     // The return code from this event is ignored.
     //
-    return(0);
+    return (0);
 }
 
 //*****************************************************************************
@@ -446,10 +410,7 @@ HandleTxComplete(tUSBBuffer *psBuffer, uint32_t ui32Size)
 // \return Returns the number of bytes remaining to be processed.
 //
 //*****************************************************************************
-static uint32_t
-HandleRequestBuffer(tUSBBuffer *psBuffer, uint32_t ui32Size,
-                    uint8_t **ppui8Buffer)
-{
+static uint32_t HandleRequestBuffer(tUSBBuffer *psBuffer, uint32_t ui32Size, uint8_t **ppui8Buffer) {
     uint32_t ui32Space;
 
     //
@@ -460,23 +421,19 @@ HandleRequestBuffer(tUSBBuffer *psBuffer, uint32_t ui32Size,
     //
     // Is there enough space available to satisfy the request?
     //
-    if(ui32Space >= ui32Size)
-    {
+    if (ui32Space >= ui32Size) {
         //
         // Yes - return the current write pointer
         //
-        *ppui8Buffer = psBuffer->sPrivateData.sRingBuf.pui8Buf +
-                       psBuffer->sPrivateData.sRingBuf.ui32WriteIndex;
-        return(ui32Size);
-    }
-    else
-    {
+        *ppui8Buffer = psBuffer->sPrivateData.sRingBuf.pui8Buf + psBuffer->sPrivateData.sRingBuf.ui32WriteIndex;
+        return (ui32Size);
+    } else {
         //
         // We do not have enough contiguous space following the current write
         // pointer to satisfy the request so do not provide a buffer.
         //
         *ppui8Buffer = (uint8_t *)0;
-        return(0);
+        return (0);
     }
 }
 
@@ -501,28 +458,24 @@ HandleRequestBuffer(tUSBBuffer *psBuffer, uint32_t ui32Size,
 //! NULL if an error is detected.
 //
 //*****************************************************************************
-const tUSBBuffer *
-USBBufferInit(tUSBBuffer *psBuffer)
-{
+const tUSBBuffer *USBBufferInit(tUSBBuffer *psBuffer) {
     //
     // Check parameter validity.
     //
-    ASSERT(psBuffer && psBuffer->pui8Buffer &&
-           psBuffer->ui32BufferSize && psBuffer->pfnAvailable &&
-           psBuffer->pfnTransfer && psBuffer->pfnCallback);
+    ASSERT(psBuffer && psBuffer->pui8Buffer && psBuffer->ui32BufferSize && psBuffer->pfnAvailable && psBuffer->pfnTransfer &&
+           psBuffer->pfnCallback);
 
     //
     // Get a pointer to the buffer workspace and initialize the variables it
     // contains.
     //
     psBuffer->sPrivateData.ui32Flags = 0;
-    USBRingBufInit(&psBuffer->sPrivateData.sRingBuf, psBuffer->pui8Buffer,
-                   psBuffer->ui32BufferSize);
+    USBRingBufInit(&psBuffer->sPrivateData.sRingBuf, psBuffer->pui8Buffer, psBuffer->ui32BufferSize);
 
     //
     // If all is well, return the same pointer we were originally passed.
     //
-    return(psBuffer);
+    return (psBuffer);
 }
 
 //*****************************************************************************
@@ -545,9 +498,7 @@ USBBufferInit(tUSBBuffer *psBuffer)
 //! \return None.
 //
 //*****************************************************************************
-void
-USBBufferZeroLengthPacketInsert(const tUSBBuffer *psBuffer, bool bSendZLP)
-{
+void USBBufferZeroLengthPacketInsert(const tUSBBuffer *psBuffer, bool bSendZLP) {
     tUSBBufferVars *psPrivate;
 
     //
@@ -562,22 +513,19 @@ USBBufferZeroLengthPacketInsert(const tUSBBuffer *psBuffer, bool bSendZLP)
 
     //
     // Set the flag telling us whether or not to send a zero-length packet
-    // after sending a full packet (64 bytes and 512 bytes for HS) and 
+    // after sending a full packet (64 bytes and 512 bytes for HS) and
     // finding no more data to send.
     //
-    if(bSendZLP)
-    {
+    if (bSendZLP) {
         //
         // Enable ZLP transmission.
         //
         psPrivate->ui32Flags |= USB_BUFFER_FLAG_SEND_ZLP;
-    }
-    else
-    {
+    } else {
         //
         // Disable ZLP transmission.
         //
-        psPrivate->ui32Flags &= ~ USB_BUFFER_FLAG_SEND_ZLP;
+        psPrivate->ui32Flags &= ~USB_BUFFER_FLAG_SEND_ZLP;
     }
 }
 
@@ -607,9 +555,7 @@ USBBufferZeroLengthPacketInsert(const tUSBBuffer *psBuffer, bool bSendZLP)
 //! \return None.
 //
 //*****************************************************************************
-void
-USBBufferInfoGet(const tUSBBuffer *psBuffer, tUSBRingBufObject *psRingBuf)
-{
+void USBBufferInfoGet(const tUSBBuffer *psBuffer, tUSBRingBufObject *psRingBuf) {
     //
     // Check parameter validity.
     //
@@ -618,9 +564,9 @@ USBBufferInfoGet(const tUSBBuffer *psBuffer, tUSBRingBufObject *psRingBuf)
     //
     // Copy the current ring buffer settings to the clients storage.
     //
-    psRingBuf->pui8Buf = psBuffer->sPrivateData.sRingBuf.pui8Buf;
-    psRingBuf->ui32ReadIndex = psBuffer->sPrivateData.sRingBuf.ui32ReadIndex;
-    psRingBuf->ui32Size = psBuffer->sPrivateData.sRingBuf.ui32ReadIndex;
+    psRingBuf->pui8Buf        = psBuffer->sPrivateData.sRingBuf.pui8Buf;
+    psRingBuf->ui32ReadIndex  = psBuffer->sPrivateData.sRingBuf.ui32ReadIndex;
+    psRingBuf->ui32Size       = psBuffer->sPrivateData.sRingBuf.ui32ReadIndex;
     psRingBuf->ui32WriteIndex = psBuffer->sPrivateData.sRingBuf.ui32WriteIndex;
 }
 
@@ -654,9 +600,7 @@ USBBufferInfoGet(const tUSBBuffer *psBuffer, tUSBRingBufObject *psRingBuf)
 //! \return None.
 //
 //*****************************************************************************
-void
-USBBufferDataWritten(const tUSBBuffer *psBuffer, uint32_t ui32Length)
-{
+void USBBufferDataWritten(const tUSBBuffer *psBuffer, uint32_t ui32Length) {
     tUSBBufferVars *psPrivate;
 
     //
@@ -673,8 +617,7 @@ USBBufferDataWritten(const tUSBBuffer *psBuffer, uint32_t ui32Length)
     // Advance the ring buffer write pointer to include the newly written
     // data.
     //
-    if(ui32Length)
-    {
+    if (ui32Length) {
         USBRingBufAdvanceWrite(&psPrivate->sRingBuf, ui32Length);
     }
 
@@ -706,9 +649,7 @@ USBBufferDataWritten(const tUSBBuffer *psBuffer, uint32_t ui32Length)
 //! \return None.
 //
 //*****************************************************************************
-void
-USBBufferDataRemoved(const tUSBBuffer *psBuffer, uint32_t ui32Length)
-{
+void USBBufferDataRemoved(const tUSBBuffer *psBuffer, uint32_t ui32Length) {
     tUSBBufferVars *psPrivate;
 
     //
@@ -725,8 +666,7 @@ USBBufferDataRemoved(const tUSBBuffer *psBuffer, uint32_t ui32Length)
     // Advance the ring buffer write pointer to include the newly written
     // data.
     //
-    if(ui32Length)
-    {
+    if (ui32Length) {
         USBRingBufAdvanceRead(&psPrivate->sRingBuf, ui32Length);
     }
 }
@@ -752,9 +692,7 @@ USBBufferDataRemoved(const tUSBBuffer *psBuffer, uint32_t ui32Length)
 //! \return Returns the previous callback pointer set for the buffer.
 //
 //*****************************************************************************
-void *
-USBBufferCallbackDataSet(tUSBBuffer *psBuffer, void *pvCBData)
-{
+void *USBBufferCallbackDataSet(tUSBBuffer *psBuffer, void *pvCBData) {
     void *pvOldData;
 
     //
@@ -770,7 +708,7 @@ USBBufferCallbackDataSet(tUSBBuffer *psBuffer, void *pvCBData)
     //
     // Give the caller the old value back.
     //
-    return(pvOldData);
+    return (pvOldData);
 }
 
 //*****************************************************************************
@@ -797,10 +735,7 @@ USBBufferCallbackDataSet(tUSBBuffer *psBuffer, void *pvCBData)
 //! \return Returns the number of bytes actually written.
 //
 //*****************************************************************************
-uint32_t
-USBBufferWrite(const tUSBBuffer *psBuffer, const uint8_t *pui8Data,
-               uint32_t ui32Length)
-{
+uint32_t USBBufferWrite(const tUSBBuffer *psBuffer, const uint8_t *pui8Data, uint32_t ui32Length) {
     uint32_t ui32Space;
     tUSBBufferVars *psPrivate;
 
@@ -828,8 +763,7 @@ USBBufferWrite(const tUSBBuffer *psBuffer, const uint8_t *pui8Data,
     //
     // Write the data to the buffer.
     //
-    if(ui32Length)
-    {
+    if (ui32Length) {
         USBRingBufWrite(&psPrivate->sRingBuf, pui8Data, ui32Length);
     }
 
@@ -841,7 +775,7 @@ USBBufferWrite(const tUSBBuffer *psBuffer, const uint8_t *pui8Data,
     //
     // Tell the caller how many bytes we wrote to the buffer.
     //
-    return(ui32Length);
+    return (ui32Length);
 }
 
 //*****************************************************************************
@@ -858,9 +792,7 @@ USBBufferWrite(const tUSBBuffer *psBuffer, const uint8_t *pui8Data,
 //! \return None.
 //
 //*****************************************************************************
-void
-USBBufferFlush(const tUSBBuffer *psBuffer)
-{
+void USBBufferFlush(const tUSBBuffer *psBuffer) {
     tUSBBufferVars *psPrivate;
 
     //
@@ -899,10 +831,7 @@ USBBufferFlush(const tUSBBuffer *psBuffer)
 //! \return Returns the number of bytes of data read.
 //
 //*****************************************************************************
-uint32_t
-USBBufferRead(const tUSBBuffer *psBuffer, uint8_t *pui8Data,
-              uint32_t ui32Length)
-{
+uint32_t USBBufferRead(const tUSBBuffer *psBuffer, uint8_t *pui8Data, uint32_t ui32Length) {
     uint32_t ui32Avail, ui32Read;
     tUSBBufferVars *psPrivate;
     //
@@ -928,15 +857,14 @@ USBBufferRead(const tUSBBuffer *psBuffer, uint8_t *pui8Data,
     //
     // Read the data from the buffer assuming there is some to read.
     //
-    if(ui32Read)
-    {
+    if (ui32Read) {
         USBRingBufRead(&psPrivate->sRingBuf, pui8Data, ui32Read);
     }
 
     //
     // Tell the caller how many bytes we wrote to their buffer.
     //
-    return(ui32Read);
+    return (ui32Read);
 }
 
 //*****************************************************************************
@@ -955,9 +883,7 @@ USBBufferRead(const tUSBBuffer *psBuffer, uint8_t *pui8Data,
 //! \return Returns the number of bytes of data in the buffer.
 //
 //*****************************************************************************
-uint32_t
-USBBufferDataAvailable(const tUSBBuffer *psBuffer)
-{
+uint32_t USBBufferDataAvailable(const tUSBBuffer *psBuffer) {
     tUSBBufferVars *psPrivate;
 
     //
@@ -973,7 +899,7 @@ USBBufferDataAvailable(const tUSBBuffer *psBuffer)
     //
     // Return the amount of data in the buffer.
     //
-    return(USBRingBufUsed(&psPrivate->sRingBuf));
+    return (USBRingBufUsed(&psPrivate->sRingBuf));
 }
 
 //*****************************************************************************
@@ -992,9 +918,7 @@ USBBufferDataAvailable(const tUSBBuffer *psBuffer)
 //! \return Returns the number of free bytes in the buffer.
 //
 //*****************************************************************************
-uint32_t
-USBBufferSpaceAvailable(const tUSBBuffer *psBuffer)
-{
+uint32_t USBBufferSpaceAvailable(const tUSBBuffer *psBuffer) {
     tUSBBufferVars *psPrivate;
 
     //
@@ -1010,7 +934,7 @@ USBBufferSpaceAvailable(const tUSBBuffer *psBuffer)
     //
     // Return the amount of space available in the buffer.
     //
-    return(USBRingBufFree(&psPrivate->sRingBuf));
+    return (USBRingBufFree(&psPrivate->sRingBuf));
 }
 
 //*****************************************************************************
@@ -1038,10 +962,7 @@ USBBufferSpaceAvailable(const tUSBBuffer *psBuffer)
 //! \return The return value is dependent upon the event being processed.
 //
 //*****************************************************************************
-uint32_t
-USBBufferEventCallback(void *pvCBData, uint32_t ui32Event,
-                       uint32_t ui32MsgValue, void *pvMsgData)
-{
+uint32_t USBBufferEventCallback(void *pvCBData, uint32_t ui32Event, uint32_t ui32MsgValue, void *pvMsgData) {
     tUSBBuffer *psBuffer;
 
     //
@@ -1053,19 +974,16 @@ USBBufferEventCallback(void *pvCBData, uint32_t ui32Event,
     //
     // Which event have we been sent?
     //
-    switch(ui32Event)
-    {
+    switch (ui32Event) {
         //
         // Data is available from the lower layer.
         //
-        case USB_EVENT_RX_AVAILABLE:
-        {
+        case USB_EVENT_RX_AVAILABLE: {
             //
             // This event is only relevant to us if we are a receive buffer.
             //
-            if(!psBuffer->bTransmitBuffer)
-            {
-                return(HandleRxAvailable(psBuffer, ui32MsgValue, pvMsgData));
+            if (!psBuffer->bTransmitBuffer) {
+                return (HandleRxAvailable(psBuffer, ui32MsgValue, (uint8_t *)pvMsgData));
             }
             break;
         }
@@ -1073,21 +991,18 @@ USBBufferEventCallback(void *pvCBData, uint32_t ui32Event,
         //
         // We are being asked how much data remains to be processed.
         //
-        case USB_EVENT_DATA_REMAINING:
-        {
-            return(HandleDataRemaining(psBuffer));
+        case USB_EVENT_DATA_REMAINING: {
+            return (HandleDataRemaining(psBuffer));
         }
 
         //
         // A previous transmission has completed.
         //
-        case USB_EVENT_TX_COMPLETE:
-        {
+        case USB_EVENT_TX_COMPLETE: {
             //
             // This event is only relevant to us if we are a transmit buffer.
             //
-            if(psBuffer->bTransmitBuffer)
-            {
+            if (psBuffer->bTransmitBuffer) {
                 //
                 // Handle the message then drop out of the switch so that the
                 // event is echoed to the layer above.
@@ -1101,14 +1016,12 @@ USBBufferEventCallback(void *pvCBData, uint32_t ui32Event,
         // We are being asked to provide a buffer into which the next packet
         // can be received.
         //
-        case USB_EVENT_REQUEST_BUFFER:
-        {
+        case USB_EVENT_REQUEST_BUFFER: {
             //
             // This event is only relevant to us if we are a receive buffer.
             //
-            if(!psBuffer->bTransmitBuffer)
-            {
-                return(HandleRequestBuffer(psBuffer, ui32MsgValue, pvMsgData));
+            if (!psBuffer->bTransmitBuffer) {
+                return (HandleRequestBuffer(psBuffer, ui32MsgValue, (uint8_t **)pvMsgData));
             }
             break;
         }
@@ -1116,8 +1029,7 @@ USBBufferEventCallback(void *pvCBData, uint32_t ui32Event,
         //
         // All other events are merely passed through to the client.
         //
-        default:
-        {
+        default: {
             break;
         }
     }
@@ -1126,8 +1038,7 @@ USBBufferEventCallback(void *pvCBData, uint32_t ui32Event,
     // If we drop out of the switch, we need to pass the event on to the client
     // unmodified and return the relevant return code back to the lower layer.
     //
-    return(psBuffer->pfnCallback(psBuffer->pvCBData, ui32Event, ui32MsgValue,
-                                 pvMsgData));
+    return (psBuffer->pfnCallback(psBuffer->pvCBData, ui32Event, ui32MsgValue, pvMsgData));
 }
 
 //*****************************************************************************

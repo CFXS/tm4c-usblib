@@ -263,6 +263,25 @@ static void *g_ppvDriverInstance[MAX_USB_DEVICES + 1];
 // that is attached to a device.
 //
 //*****************************************************************************
+
+enum PipeState_t {
+    ePipeReading,
+    ePipeReadDMA,
+    ePipeReadDMAWait,
+    ePipeReadSingle,
+    ePipeDataReady,
+    ePipeDataSent,
+    ePipeWriting,
+    ePipeWriteDMA,
+    ePipeWriteDMASend,
+    ePipeWriteDMAWait,
+    ePipeWriteSingle,
+    ePipeStalled,
+    ePipeError,
+    ePipeIdle,
+    ePipeDisabled
+};
+
 typedef struct
 {
     //
@@ -318,25 +337,7 @@ typedef struct
     //
     // The state of a given USB pipe.
     //
-    volatile enum
-    {
-        ePipeReading,
-        ePipeReadDMA,
-        ePipeReadDMAWait,
-        ePipeReadSingle,
-        ePipeDataReady,
-        ePipeDataSent,
-        ePipeWriting,
-        ePipeWriteDMA,
-        ePipeWriteDMASend,
-        ePipeWriteDMAWait,
-        ePipeWriteSingle,
-        ePipeStalled,
-        ePipeError,
-        ePipeIdle,
-        ePipeDisabled
-    }
-    iState;
+    volatile PipeState_t iState;
 
     //
     // The actual FIFO offset allocated to this endpoint.
@@ -563,7 +564,7 @@ ConfigDescAlloc(tUSBHostDevice *psDevice, uint32_t ui32Size)
         //
         // Allocate the root connection to the device.
         //
-        g_sUSBHCD.psUSBDevice[0].psConfigDescriptor = g_sUSBHCD.pvPool;
+        g_sUSBHCD.psUSBDevice[0].psConfigDescriptor = (tConfigDescriptor *)g_sUSBHCD.pvPool;
         g_sUSBHCD.psUSBDevice[0].ui32ConfigDescriptorSize = ui32Size;
 
         //

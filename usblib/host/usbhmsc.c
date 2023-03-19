@@ -4,20 +4,20 @@
 //
 // Copyright (c) 2008-2020 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
-// 
+//
 // Texas Instruments (TI) is supplying this software for use solely and
 // exclusively on TI's microcontroller products. The software is owned by
 // TI and/or its suppliers, and is protected under applicable copyright
 // laws. You may not combine this software with "viral" open-source
 // software in order to form a larger program.
-// 
+//
 // THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
 // NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 // A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
 // CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
 // DAMAGES, FOR ANY REASON WHATSOEVER.
-// 
+//
 // This is part of revision 2.2.0.295 of the Tiva USB Library.
 //
 //*****************************************************************************
@@ -54,8 +54,7 @@ static void USBHMSCClose(void *pvInstance);
 // This is the structure for an instance of a USB MSC host driver.
 //
 //*****************************************************************************
-struct tUSBHMSCInstance
-{
+struct tUSBHMSCInstance {
     //
     // Save the device instance.
     //
@@ -97,10 +96,7 @@ struct tUSBHMSCInstance
 // The array of USB MSC host drivers.
 //
 //*****************************************************************************
-static tUSBHMSCInstance g_sUSBHMSCDevice =
-{
-    0
-};
+static tUSBHMSCInstance g_sUSBHMSCDevice = {};
 
 //*****************************************************************************
 //
@@ -108,13 +104,7 @@ static tUSBHMSCInstance g_sUSBHMSCDevice =
 //! is provided with the USB library.
 //
 //*****************************************************************************
-const tUSBHostClassDriver g_sUSBHostMSCClassDriver =
-{
-    USB_CLASS_MASS_STORAGE,
-    USBHMSCOpen,
-    USBHMSCClose,
-    0
-};
+const tUSBHostClassDriver g_sUSBHostMSCClassDriver = {USB_CLASS_MASS_STORAGE, USBHMSCOpen, USBHMSCClose, 0};
 
 //*****************************************************************************
 //
@@ -131,9 +121,7 @@ const tUSBHostClassDriver g_sUSBHostMSCClassDriver =
 //! \return The function will return a pointer to a MSC driver instance.
 //
 //*****************************************************************************
-static void *
-USBHMSCOpen(tUSBHostDevice *psDevice)
-{
+static void *USBHMSCOpen(tUSBHostDevice *psDevice) {
     int32_t i32Idx;
     tEndpointDescriptor *psEndpointDescriptor;
     tInterfaceDescriptor *psInterface;
@@ -141,9 +129,8 @@ USBHMSCOpen(tUSBHostDevice *psDevice)
     //
     // Don't allow the device to be opened without closing first.
     //
-    if(g_sUSBHMSCDevice.psDevice)
-    {
-        return(0);
+    if (g_sUSBHMSCDevice.psDevice) {
+        return (0);
     }
 
     //
@@ -159,69 +146,52 @@ USBHMSCOpen(tUSBHostDevice *psDevice)
     //
     // Loop through the endpoints of the device.
     //
-    for(i32Idx = 0; i32Idx < 3; i32Idx++)
-    {
+    for (i32Idx = 0; i32Idx < 3; i32Idx++) {
         //
         // Get the first endpoint descriptor.
         //
-        psEndpointDescriptor =
-            USBDescGetInterfaceEndpoint(psInterface, i32Idx,
-                                        psDevice->ui32ConfigDescriptorSize);
+        psEndpointDescriptor = USBDescGetInterfaceEndpoint(psInterface, i32Idx, psDevice->ui32ConfigDescriptorSize);
 
         //
         // If no more endpoints then break out.
         //
-        if(psEndpointDescriptor == 0)
-        {
+        if (psEndpointDescriptor == 0) {
             break;
         }
 
         //
         // See if this is a bulk endpoint.
         //
-        if((psEndpointDescriptor->bmAttributes & USB_EP_ATTR_TYPE_M) ==
-           USB_EP_ATTR_BULK)
-        {
+        if ((psEndpointDescriptor->bmAttributes & USB_EP_ATTR_TYPE_M) == USB_EP_ATTR_BULK) {
             //
             // See if this is bulk IN or bulk OUT.
             //
-            if(psEndpointDescriptor->bEndpointAddress & USB_EP_DESC_IN)
-            {
+            if (psEndpointDescriptor->bEndpointAddress & USB_EP_DESC_IN) {
                 //
                 // Allocate the USB Pipe for this Bulk IN endpoint.
                 //
                 g_sUSBHMSCDevice.ui32BulkInPipe =
-                    USBHCDPipeAllocSize(0, USBHCD_PIPE_BULK_IN_DMA,
-                                        psDevice,
-                                        psEndpointDescriptor->wMaxPacketSize,
-                                        0);
+                    USBHCDPipeAllocSize(0, USBHCD_PIPE_BULK_IN_DMA, psDevice, psEndpointDescriptor->wMaxPacketSize, 0);
                 //
                 // Configure the USB pipe as a Bulk IN endpoint.
                 //
                 USBHCDPipeConfig(g_sUSBHMSCDevice.ui32BulkInPipe,
                                  psEndpointDescriptor->wMaxPacketSize,
                                  0,
-                                 (psEndpointDescriptor->bEndpointAddress &
-                                  USB_EP_DESC_NUM_M));
-            }
-            else
-            {
+                                 (psEndpointDescriptor->bEndpointAddress & USB_EP_DESC_NUM_M));
+            } else {
                 //
                 // Allocate the USB Pipe for this Bulk OUT endpoint.
                 //
                 g_sUSBHMSCDevice.ui32BulkOutPipe =
-                    USBHCDPipeAllocSize(0, USBHCD_PIPE_BULK_OUT_DMA,
-                                        psDevice,
-                                        psEndpointDescriptor->wMaxPacketSize,
-                                        0);
+                    USBHCDPipeAllocSize(0, USBHCD_PIPE_BULK_OUT_DMA, psDevice, psEndpointDescriptor->wMaxPacketSize, 0);
                 //
                 // Configure the USB pipe as a Bulk OUT endpoint.
                 //
                 USBHCDPipeConfig(g_sUSBHMSCDevice.ui32BulkOutPipe,
                                  psEndpointDescriptor->wMaxPacketSize,
                                  0,
-                                 (psEndpointDescriptor->bEndpointAddress &
-                                  USB_EP_DESC_NUM_M));
+                                 (psEndpointDescriptor->bEndpointAddress & USB_EP_DESC_NUM_M));
             }
         }
     }
@@ -229,18 +199,16 @@ USBHMSCOpen(tUSBHostDevice *psDevice)
     //
     // If the callback exists, call it with an Open event.
     //
-    if(g_sUSBHMSCDevice.pfnCallback != 0)
-    {
+    if (g_sUSBHMSCDevice.pfnCallback != 0) {
         g_sUSBHMSCDevice.pfnCallback(&g_sUSBHMSCDevice, MSC_EVENT_OPEN, 0);
     }
-
 
     g_sUSBHMSCDevice.ui32MaxLUN = 0xffffffff;
 
     //
     // Return the only instance of this device.
     //
-    return(&g_sUSBHMSCDevice);
+    return (&g_sUSBHMSCDevice);
 }
 
 //*****************************************************************************
@@ -256,14 +224,11 @@ USBHMSCOpen(tUSBHostDevice *psDevice)
 //! \return None.
 //
 //*****************************************************************************
-static void
-USBHMSCClose(void *pvInstance)
-{
+static void USBHMSCClose(void *pvInstance) {
     //
     // Do nothing if there is not a driver open.
     //
-    if(g_sUSBHMSCDevice.psDevice == 0)
-    {
+    if (g_sUSBHMSCDevice.psDevice == 0) {
         return;
     }
 
@@ -275,24 +240,21 @@ USBHMSCClose(void *pvInstance)
     //
     // Free the Bulk IN pipe.
     //
-    if(g_sUSBHMSCDevice.ui32BulkInPipe != 0)
-    {
+    if (g_sUSBHMSCDevice.ui32BulkInPipe != 0) {
         USBHCDPipeFree(g_sUSBHMSCDevice.ui32BulkInPipe);
     }
 
     //
     // Free the Bulk OUT pipe.
     //
-    if(g_sUSBHMSCDevice.ui32BulkOutPipe != 0)
-    {
+    if (g_sUSBHMSCDevice.ui32BulkOutPipe != 0) {
         USBHCDPipeFree(g_sUSBHMSCDevice.ui32BulkOutPipe);
     }
 
     //
     // If the callback exists then call it.
     //
-    if(g_sUSBHMSCDevice.pfnCallback != 0)
-    {
+    if (g_sUSBHMSCDevice.pfnCallback != 0) {
         g_sUSBHMSCDevice.pfnCallback(&g_sUSBHMSCDevice, MSC_EVENT_CLOSE, 0);
     }
 }
@@ -316,23 +278,19 @@ USBHMSCClose(void *pvInstance)
 //! \return None.
 //
 //*****************************************************************************
-static void
-USBHMSCGetMaxLUN(tUSBHostDevice *psDevice, uint32_t ui32Interface,
-                 uint8_t *pui8MaxLUN)
-{
+static void USBHMSCGetMaxLUN(tUSBHostDevice *psDevice, uint32_t ui32Interface, uint8_t *pui8MaxLUN) {
     tUSBRequest sSetupPacket;
 
     //
     // This is a Class specific interface IN request.
     //
-    sSetupPacket.bmRequestType =
-        USB_RTYPE_DIR_IN | USB_RTYPE_CLASS | USB_RTYPE_INTERFACE;
+    sSetupPacket.bmRequestType = USB_RTYPE_DIR_IN | USB_RTYPE_CLASS | USB_RTYPE_INTERFACE;
 
     //
     // Request a the Max LUN for this interface.
     //
     sSetupPacket.bRequest = USBREQ_GET_MAX_LUN;
-    sSetupPacket.wValue = 0;
+    sSetupPacket.wValue   = 0;
 
     //
     // Indicate the interface to use.
@@ -347,9 +305,7 @@ USBHMSCGetMaxLUN(tUSBHostDevice *psDevice, uint32_t ui32Interface,
     //
     // Put the setup packet in the buffer and send the command.
     //
-    if(USBHCDControlTransfer(0, &sSetupPacket, psDevice, pui8MaxLUN, 1,
-                             MAX_PACKET_SIZE_EP0) != 1)
-    {
+    if (USBHCDControlTransfer(0, &sSetupPacket, psDevice, pui8MaxLUN, 1, MAX_PACKET_SIZE_EP0) != 1) {
         *pui8MaxLUN = 0;
     }
 }
@@ -369,30 +325,25 @@ USBHMSCGetMaxLUN(tUSBHostDevice *psDevice, uint32_t ui32Interface,
 //! returns a other value if the device is not ready or if an error occurred.
 //
 //*****************************************************************************
-int32_t
-USBHMSCDriveReady(tUSBHMSCInstance *psMSCInstance)
-{
+int32_t USBHMSCDriveReady(tUSBHMSCInstance *psMSCInstance) {
     uint8_t ui8MaxLUN, pui8Buffer[SCSI_INQUIRY_DATA_SZ];
     uint32_t ui32Size;
 
     //
     // If there is no device present then return an error.
     //
-    if(psMSCInstance->psDevice == 0)
-    {
-        return(-1);
+    if (psMSCInstance->psDevice == 0) {
+        return (-1);
     }
 
     //
     // Only request the maximum number of LUNs once.
     //
-    if(g_sUSBHMSCDevice.ui32MaxLUN == 0xffffffff)
-    {
+    if (g_sUSBHMSCDevice.ui32MaxLUN == 0xffffffff) {
         //
         // Get the Maximum LUNs on this device.
         //
-        USBHMSCGetMaxLUN(g_sUSBHMSCDevice.psDevice,
-                         g_sUSBHMSCDevice.psDevice->ui32Interface, &ui8MaxLUN);
+        USBHMSCGetMaxLUN(g_sUSBHMSCDevice.psDevice, g_sUSBHMSCDevice.psDevice->ui32Interface, &ui8MaxLUN);
 
         //
         // Save the Maximum number of LUNs on this device.
@@ -404,106 +355,79 @@ USBHMSCDriveReady(tUSBHMSCInstance *psMSCInstance)
     // Just return if the device is returning not present.
     //
     ui32Size = SCSI_REQUEST_SENSE_SZ;
-    if(USBHSCSIRequestSense(psMSCInstance->ui32BulkInPipe,
-                            psMSCInstance->ui32BulkOutPipe, pui8Buffer,
-                            &ui32Size) != SCSI_CMD_STATUS_PASS)
-    {
-        return(-1);
+    if (USBHSCSIRequestSense(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe, pui8Buffer, &ui32Size) !=
+        SCSI_CMD_STATUS_PASS) {
+        return (-1);
     }
 
-    if((pui8Buffer[SCSI_RS_SKEY] == SCSI_RS_KEY_UNIT_ATTN) &&
-       (pui8Buffer[SCSI_RS_SKEY_AD_SKEY] == SCSI_RS_KEY_NOTPRSNT))
-    {
-        return(-1);
+    if ((pui8Buffer[SCSI_RS_SKEY] == SCSI_RS_KEY_UNIT_ATTN) && (pui8Buffer[SCSI_RS_SKEY_AD_SKEY] == SCSI_RS_KEY_NOTPRSNT)) {
+        return (-1);
     }
 
     //
     // Issue a SCSI Inquiry to get basic information on the device
     //
     ui32Size = SCSI_INQUIRY_DATA_SZ;
-    if((USBHSCSIInquiry(psMSCInstance->ui32BulkInPipe,
-                        psMSCInstance->ui32BulkOutPipe, pui8Buffer,
-                        &ui32Size) != SCSI_CMD_STATUS_PASS))
-    {
-        return(-1);
+    if ((USBHSCSIInquiry(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe, pui8Buffer, &ui32Size) != SCSI_CMD_STATUS_PASS)) {
+        return (-1);
     }
 
     //
     // Get the size of the drive.
     //
     ui32Size = SCSI_INQUIRY_DATA_SZ;
-    if(USBHSCSIReadCapacity(psMSCInstance->ui32BulkInPipe,
-                            psMSCInstance->ui32BulkOutPipe, pui8Buffer,
-                            &ui32Size) != SCSI_CMD_STATUS_PASS)
-    {
+    if (USBHSCSIReadCapacity(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe, pui8Buffer, &ui32Size) !=
+        SCSI_CMD_STATUS_PASS) {
         //
         // Get the current sense data from the device to see why it failed
         // the Read Capacity command.
         //
         ui32Size = SCSI_REQUEST_SENSE_SZ;
-        USBHSCSIRequestSense(psMSCInstance->ui32BulkInPipe,
-                             psMSCInstance->ui32BulkOutPipe, pui8Buffer,
-                             &ui32Size);
+        USBHSCSIRequestSense(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe, pui8Buffer, &ui32Size);
 
         //
         // If the read capacity failed then check if the drive is ready.
         //
-        if(USBHSCSITestUnitReady(psMSCInstance->ui32BulkInPipe,
-                                 psMSCInstance->ui32BulkOutPipe) !=
-           SCSI_CMD_STATUS_PASS)
-        {
+        if (USBHSCSITestUnitReady(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe) != SCSI_CMD_STATUS_PASS) {
             //
             // Get the current sense data from the device to see why it failed
             // the Test Unit Ready command.
             //
             ui32Size = SCSI_REQUEST_SENSE_SZ;
-            USBHSCSIRequestSense(psMSCInstance->ui32BulkInPipe,
-                                 psMSCInstance->ui32BulkOutPipe, pui8Buffer,
-                                 &ui32Size);
+            USBHSCSIRequestSense(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe, pui8Buffer, &ui32Size);
         }
 
-        return(-1);
-    }
-    else
-    {
+        return (-1);
+    } else {
         //
         // Read the block size out, value is stored big endian.
         //
-        psMSCInstance->ui32BlockSize =
-             (pui8Buffer[7] | (pui8Buffer[6] << 8) | pui8Buffer[5] << 16 |
-              (pui8Buffer[4] << 24));
+        psMSCInstance->ui32BlockSize = (pui8Buffer[7] | (pui8Buffer[6] << 8) | pui8Buffer[5] << 16 | (pui8Buffer[4] << 24));
 
         //
         // Read the block size out.
         //
-        psMSCInstance->ui32NumBlocks =
-            (pui8Buffer[3] | (pui8Buffer[2] << 8) | pui8Buffer[1] << 16 |
-             (pui8Buffer[0] << 24));
+        psMSCInstance->ui32NumBlocks = (pui8Buffer[3] | (pui8Buffer[2] << 8) | pui8Buffer[1] << 16 | (pui8Buffer[0] << 24));
     }
 
     //
     // See if the drive is ready to use.
     //
-    if(USBHSCSITestUnitReady(psMSCInstance->ui32BulkInPipe,
-                             psMSCInstance->ui32BulkOutPipe) !=
-       SCSI_CMD_STATUS_PASS)
-    {
+    if (USBHSCSITestUnitReady(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe) != SCSI_CMD_STATUS_PASS) {
         //
         // Get the current sense data from the device to see why it failed
         // the Test Unit Ready command.
         //
         ui32Size = SCSI_REQUEST_SENSE_SZ;
-        USBHSCSIRequestSense(psMSCInstance->ui32BulkInPipe,
-                             psMSCInstance->ui32BulkOutPipe, pui8Buffer,
-                             &ui32Size);
+        USBHSCSIRequestSense(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe, pui8Buffer, &ui32Size);
 
-        return(-1);
+        return (-1);
     }
 
     //
     // Success.
     //
-    return(0);
+    return (0);
 }
 
 //*****************************************************************************
@@ -528,15 +452,12 @@ USBHMSCDriveReady(tUSBHMSCInstance *psMSCInstance)
 //! this call, this function will return zero.
 //
 //*****************************************************************************
-tUSBHMSCInstance *
-USBHMSCDriveOpen(uint32_t ui32Drive, tUSBHMSCCallback pfnCallback)
-{
+tUSBHMSCInstance *USBHMSCDriveOpen(uint32_t ui32Drive, tUSBHMSCCallback pfnCallback) {
     //
     // Only the first drive is supported and only one callback is supported.
     //
-    if((ui32Drive != 0) || (g_sUSBHMSCDevice.pfnCallback))
-    {
-        return(0);
+    if ((ui32Drive != 0) || (g_sUSBHMSCDevice.pfnCallback)) {
+        return (0);
     }
 
     //
@@ -547,7 +468,7 @@ USBHMSCDriveOpen(uint32_t ui32Drive, tUSBHMSCCallback pfnCallback)
     //
     // Return the requested device instance.
     //
-    return(&g_sUSBHMSCDevice);
+    return (&g_sUSBHMSCDevice);
 }
 
 //*****************************************************************************
@@ -564,9 +485,7 @@ USBHMSCDriveOpen(uint32_t ui32Drive, tUSBHMSCCallback pfnCallback)
 //! \return None.
 //
 //*****************************************************************************
-void
-USBHMSCDriveClose(tUSBHMSCInstance *psMSCInstance)
-{
+void USBHMSCDriveClose(tUSBHMSCInstance *psMSCInstance) {
     //
     // Close the drive (if it is already open)
     //
@@ -598,18 +517,14 @@ USBHMSCDriveClose(tUSBHMSCInstance *psMSCInstance)
 //! indicates a failure.
 //
 //*****************************************************************************
-int32_t
-USBHMSCBlockRead(tUSBHMSCInstance *psMSCInstance, uint32_t ui32LBA,
-                 uint8_t *pui8Data, uint32_t ui32NumBlocks)
-{
+int32_t USBHMSCBlockRead(tUSBHMSCInstance *psMSCInstance, uint32_t ui32LBA, uint8_t *pui8Data, uint32_t ui32NumBlocks) {
     uint32_t ui32Size;
 
     //
     // If there is no device present then return an error.
     //
-    if(psMSCInstance->psDevice == 0)
-    {
-        return(-1);
+    if (psMSCInstance->psDevice == 0) {
+        return (-1);
     }
 
     //
@@ -620,17 +535,15 @@ USBHMSCBlockRead(tUSBHMSCInstance *psMSCInstance, uint32_t ui32LBA,
     //
     // Perform the SCSI read command.
     //
-    if(USBHSCSIRead10(psMSCInstance->ui32BulkInPipe,
-                      psMSCInstance->ui32BulkOutPipe, ui32LBA, pui8Data,
-                      &ui32Size, ui32NumBlocks) != SCSI_CMD_STATUS_PASS)
-    {
-        return(-1);
+    if (USBHSCSIRead10(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe, ui32LBA, pui8Data, &ui32Size, ui32NumBlocks) !=
+        SCSI_CMD_STATUS_PASS) {
+        return (-1);
     }
 
     //
     // Success.
     //
-    return(0);
+    return (0);
 }
 
 //*****************************************************************************
@@ -654,18 +567,14 @@ USBHMSCBlockRead(tUSBHMSCInstance *psMSCInstance, uint32_t ui32LBA,
 //! indicates a failure.
 //
 //*****************************************************************************
-int32_t
-USBHMSCBlockWrite(tUSBHMSCInstance *psMSCInstance, uint32_t ui32LBA,
-                  uint8_t *pui8Data, uint32_t ui32NumBlocks)
-{
+int32_t USBHMSCBlockWrite(tUSBHMSCInstance *psMSCInstance, uint32_t ui32LBA, uint8_t *pui8Data, uint32_t ui32NumBlocks) {
     uint32_t ui32Size;
 
     //
     // If there is no device present then return an error.
     //
-    if(psMSCInstance->psDevice == 0)
-    {
-        return(-1);
+    if (psMSCInstance->psDevice == 0) {
+        return (-1);
     }
 
     //
@@ -676,17 +585,15 @@ USBHMSCBlockWrite(tUSBHMSCInstance *psMSCInstance, uint32_t ui32LBA,
     //
     // Perform the SCSI write command.
     //
-    if(USBHSCSIWrite10(psMSCInstance->ui32BulkInPipe,
-                       psMSCInstance->ui32BulkOutPipe, ui32LBA, pui8Data,
-                       &ui32Size, ui32NumBlocks) != SCSI_CMD_STATUS_PASS)
-    {
-        return(-1);
+    if (USBHSCSIWrite10(psMSCInstance->ui32BulkInPipe, psMSCInstance->ui32BulkOutPipe, ui32LBA, pui8Data, &ui32Size, ui32NumBlocks) !=
+        SCSI_CMD_STATUS_PASS) {
+        return (-1);
     }
 
     //
     // Success.
     //
-    return(0);
+    return (0);
 }
 
 //*****************************************************************************
@@ -711,13 +618,11 @@ USBHMSCBlockWrite(tUSBHMSCInstance *psMSCInstance, uint32_t ui32LBA,
 //! - USBHCD_LPM_PENDING - There is already an LPM request pending.
 //
 //*****************************************************************************
-uint32_t
-USBHMSCLPMSleep(tUSBHMSCInstance *psMSCInstance)
-{
+uint32_t USBHMSCLPMSleep(tUSBHMSCInstance *psMSCInstance) {
     //
     // Call the host controller function to send the sleep command.
     //
-    return(USBHCDLPMSleep(psMSCInstance->psDevice));
+    return (USBHCDLPMSleep(psMSCInstance->psDevice));
 }
 
 //*****************************************************************************
@@ -739,13 +644,11 @@ USBHMSCLPMSleep(tUSBHMSCInstance *psMSCInstance)
 //! - \b USBHCD_LPM_PENDING - The last LPM request has not completed.
 //
 //*****************************************************************************
-uint32_t
-USBHMSCLPMStatus(tUSBHMSCInstance *psMSCInstance)
-{
+uint32_t USBHMSCLPMStatus(tUSBHMSCInstance *psMSCInstance) {
     //
     // Call the host controller function to get the current LPM status.
     //
-    return(USBHCDLPMStatus(psMSCInstance->psDevice));
+    return (USBHCDLPMStatus(psMSCInstance->psDevice));
 }
 
 //*****************************************************************************

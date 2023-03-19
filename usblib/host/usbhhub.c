@@ -4,20 +4,20 @@
 //
 // Copyright (c) 2011-2020 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
-// 
+//
 // Texas Instruments (TI) is supplying this software for use solely and
 // exclusively on TI's microcontroller products. The software is owned by
 // TI and/or its suppliers, and is protected under applicable copyright
 // laws. You may not combine this software with "viral" open-source
 // software in order to form a larger program.
-// 
+//
 // THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
 // NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 // A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
 // CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
 // DAMAGES, FOR ANY REASON WHATSOEVER.
-// 
+//
 // This is part of revision 2.2.0.295 of the Tiva USB Library.
 //
 //*****************************************************************************
@@ -36,10 +36,12 @@
 #include "usblib/host/usbhostpriv.h"
 #include "usblib/host/usbhhub.h"
 #ifdef INCLUDE_DEBUG_OUTPUT
-#include "utils/uartstdio.h"
-#define DEBUG_OUTPUT UARTprintf
+    #include "utils/uartstdio.h"
+    #define DEBUG_OUTPUT UARTprintf
 #else
-#define DEBUG_OUTPUT while(0)((int (*)(char *, ...))0)
+    #define DEBUG_OUTPUT \
+        while (0)        \
+        ((int (*)(char *, ...))0)
 #endif
 
 //*****************************************************************************
@@ -50,7 +52,7 @@
 //*****************************************************************************
 
 #ifdef ewarm
-#pragma pack(1)
+    #pragma pack(1)
 #endif
 
 //*****************************************************************************
@@ -60,8 +62,7 @@
 //! 2.0 specification.
 //
 //*****************************************************************************
-typedef struct
-{
+typedef struct {
     //
     //! The total number of bytes in the descriptor (including this field).
     //
@@ -105,11 +106,10 @@ typedef struct
     //! the bNbrPorts field above.
     //
     uint8_t PortInfo[((ROOT_HUB_MAX_PORTS + 7) / 8) * 2];
-}
-PACKED tUsbHubDescriptor;
+} PACKED tUsbHubDescriptor;
 
 #ifdef ewarm
-#pragma pack()
+    #pragma pack()
 #endif
 
 //*****************************************************************************
@@ -117,8 +117,7 @@ PACKED tUsbHubDescriptor;
 // This structure holds all data specific to a single hub port.
 //
 //*****************************************************************************
-typedef struct
-{
+typedef struct {
     //
     // The handle used by the HCD layer to identify this device.
     //
@@ -150,17 +149,16 @@ typedef struct
     // port.
     //
     volatile bool bChanged;
-}
-tHubPort;
+} tHubPort;
 
 //*****************************************************************************
 //
 // USB hub flags values for tHubInstance.ui32Flags.
 //
 //*****************************************************************************
-#define USBLIB_HUB_ACTIVE       0x00000001
-#define USBLIB_HUB_HS           0x00000002
-#define USBLIB_HUB_MULTI_TT     0x00000004
+#define USBLIB_HUB_ACTIVE   0x00000001
+#define USBLIB_HUB_HS       0x00000002
+#define USBLIB_HUB_MULTI_TT 0x00000004
 
 //*****************************************************************************
 //
@@ -168,8 +166,7 @@ tHubPort;
 // a Hub device.
 //
 //*****************************************************************************
-struct tHubInstance
-{
+struct tHubInstance {
     //
     // Save the device instance.
     //
@@ -254,13 +251,7 @@ static void HubDriverClose(void *pvHubDevice);
 //! provided with the USB library.
 //
 //*****************************************************************************
-const tUSBHostClassDriver g_sUSBHubClassDriver =
-{
-    USB_CLASS_HUB,
-    HubDriverOpen,
-    HubDriverClose,
-    0
-};
+const tUSBHostClassDriver g_sUSBHubClassDriver = {USB_CLASS_HUB, HubDriverOpen, HubDriverClose, 0};
 
 //*****************************************************************************
 //
@@ -296,9 +287,7 @@ static uint32_t g_ui32HubChanges;
 // \return None.
 //
 //*****************************************************************************
-static void
-USBHubPortSpeedSet(uint8_t ui8Port, uint32_t ui32Speed)
-{
+static void USBHubPortSpeedSet(uint8_t ui8Port, uint32_t ui32Speed) {
     g_sRootHub.psPorts[ui8Port].ui32Speed = ui32Speed;
 }
 
@@ -323,10 +312,7 @@ USBHubPortSpeedSet(uint8_t ui8Port, uint32_t ui32Speed)
 // \return None.
 //
 //*****************************************************************************
-static void
-HubSetPortFeature(tHubInstance *psHubInstance, uint8_t ui8Port,
-                  uint16_t ui16Feature)
-{
+static void HubSetPortFeature(tHubInstance *psHubInstance, uint8_t ui8Port, uint16_t ui16Feature) {
     tUSBRequest sSetupPacket;
     tUSBHostDevice *psDevice;
 
@@ -338,22 +324,20 @@ HubSetPortFeature(tHubInstance *psHubInstance, uint8_t ui8Port,
     //
     // This is a standard OUT request.
     //
-    sSetupPacket.bmRequestType = USB_RTYPE_DIR_OUT | USB_RTYPE_CLASS |
-                                 USB_RTYPE_OTHER;
+    sSetupPacket.bmRequestType = USB_RTYPE_DIR_OUT | USB_RTYPE_CLASS | USB_RTYPE_OTHER;
 
     //
     // Set the field to clear the requested port feature.
     //
     sSetupPacket.bRequest = USBREQ_SET_FEATURE;
-    sSetupPacket.wValue = ui16Feature;
-    sSetupPacket.wIndex = ui8Port;
-    sSetupPacket.wLength = 0;
+    sSetupPacket.wValue   = ui16Feature;
+    sSetupPacket.wIndex   = ui8Port;
+    sSetupPacket.wLength  = 0;
 
     //
     // Send the request.
     //
-    USBHCDControlTransfer(0, &sSetupPacket, psDevice, 0, 0,
-                          psDevice->sDeviceDescriptor.bMaxPacketSize0);
+    USBHCDControlTransfer(0, &sSetupPacket, psDevice, 0, 0, psDevice->sDeviceDescriptor.bMaxPacketSize0);
 }
 
 //*****************************************************************************
@@ -378,10 +362,7 @@ HubSetPortFeature(tHubInstance *psHubInstance, uint8_t ui8Port,
 // \return None.
 //
 //*****************************************************************************
-static void
-HubClearPortFeature(tHubInstance *psHubInstance, uint8_t ui8Port,
-                    uint16_t ui16Feature)
-{
+static void HubClearPortFeature(tHubInstance *psHubInstance, uint8_t ui8Port, uint16_t ui16Feature) {
     tUSBRequest sSetupPacket;
     tUSBHostDevice *psDevice;
 
@@ -393,22 +374,20 @@ HubClearPortFeature(tHubInstance *psHubInstance, uint8_t ui8Port,
     //
     // This is a standard OUT request.
     //
-    sSetupPacket.bmRequestType = USB_RTYPE_DIR_OUT | USB_RTYPE_CLASS |
-                                 USB_RTYPE_OTHER;
+    sSetupPacket.bmRequestType = USB_RTYPE_DIR_OUT | USB_RTYPE_CLASS | USB_RTYPE_OTHER;
 
     //
     // Set the field to clear the requested port feature.
     //
     sSetupPacket.bRequest = USBREQ_CLEAR_FEATURE;
-    sSetupPacket.wValue = ui16Feature;
-    sSetupPacket.wIndex = ui8Port;
-    sSetupPacket.wLength = 0;
+    sSetupPacket.wValue   = ui16Feature;
+    sSetupPacket.wIndex   = ui8Port;
+    sSetupPacket.wLength  = 0;
 
     //
     // Send the request.
     //
-    USBHCDControlTransfer(0, &sSetupPacket, psDevice, 0, 0,
-                          psDevice->sDeviceDescriptor.bMaxPacketSize0);
+    USBHCDControlTransfer(0, &sSetupPacket, psDevice, 0, 0, psDevice->sDeviceDescriptor.bMaxPacketSize0);
 }
 
 //*****************************************************************************
@@ -432,10 +411,7 @@ HubClearPortFeature(tHubInstance *psHubInstance, uint8_t ui8Port,
 // \return None.
 //
 //*****************************************************************************
-static bool
-HubGetPortStatus(tHubInstance *psHubInstance, uint8_t ui8Port,
-                 uint16_t *pui16PortStatus, uint16_t *pui16PortChange)
-{
+static bool HubGetPortStatus(tHubInstance *psHubInstance, uint8_t ui8Port, uint16_t *pui16PortStatus, uint16_t *pui16PortChange) {
     uint32_t ui32Data, ui32Read;
     tUSBRequest sSetupPacket;
     tUSBHostDevice *psDevice;
@@ -448,33 +424,27 @@ HubGetPortStatus(tHubInstance *psHubInstance, uint8_t ui8Port,
     //
     // This is a standard OUT request.
     //
-    sSetupPacket.bmRequestType = USB_RTYPE_DIR_IN | USB_RTYPE_CLASS |
-                                 USB_RTYPE_OTHER;
+    sSetupPacket.bmRequestType = USB_RTYPE_DIR_IN | USB_RTYPE_CLASS | USB_RTYPE_OTHER;
 
     //
     // Set the fields to get the hub status.
     //
     sSetupPacket.bRequest = USBREQ_GET_STATUS;
-    sSetupPacket.wValue = 0;
-    sSetupPacket.wIndex = (uint16_t)ui8Port;
-    sSetupPacket.wLength = 4;
+    sSetupPacket.wValue   = 0;
+    sSetupPacket.wIndex   = (uint16_t)ui8Port;
+    sSetupPacket.wLength  = 4;
 
     //
     // Send the request.
     //
-    ui32Read = USBHCDControlTransfer(0, &sSetupPacket, psDevice,
-                                (uint8_t *)&ui32Data, 4,
-                                psDevice->sDeviceDescriptor.bMaxPacketSize0);
+    ui32Read = USBHCDControlTransfer(0, &sSetupPacket, psDevice, (uint8_t *)&ui32Data, 4, psDevice->sDeviceDescriptor.bMaxPacketSize0);
 
     //
     // Check that we received the correct number of bytes.
     //
-    if(ui32Read != 4)
-    {
-        return(false);
-    }
-    else
-    {
+    if (ui32Read != 4) {
+        return (false);
+    } else {
         //
         // We got 4 bytes from the device. Now translate these into the 2
         // 16-bit values we pass back to the caller.
@@ -482,14 +452,13 @@ HubGetPortStatus(tHubInstance *psHubInstance, uint8_t ui8Port,
         *pui16PortStatus = (uint16_t)(ui32Data & 0xFFFF);
         *pui16PortChange = (uint16_t)(ui32Data >> 16);
 
-        DEBUG_OUTPUT("Port %d, status 0x%04x, change 0x%04x\n", ui8Port,
-                     *pui16PortStatus, *pui16PortChange);
+        DEBUG_OUTPUT("Port %d, status 0x%04x, change 0x%04x\n", ui8Port, *pui16PortStatus, *pui16PortChange);
     }
 
     //
     // All is well.
     //
-    return(true);
+    return (true);
 }
 
 //*****************************************************************************
@@ -498,30 +467,24 @@ HubGetPortStatus(tHubInstance *psHubInstance, uint8_t ui8Port,
 // device.
 //
 //*****************************************************************************
-static void
-HubIntINCallback(uint32_t ui32Pipe, uint32_t ui32Event)
-{
-    switch (ui32Event)
-    {
+static void HubIntINCallback(uint32_t ui32Pipe, uint32_t ui32Event) {
+    switch (ui32Event) {
         //
         // Handles a request to schedule a new request on the interrupt IN
         // pipe.
         //
-        case USB_EVENT_SCHEDULER:
-        {
+        case USB_EVENT_SCHEDULER: {
             //
             // Set things up to read the next change indication from the hub.
             //
-            USBHCDPipeSchedule(ui32Pipe, (uint8_t *)&g_ui32HubChanges,
-                               (uint32_t)g_sRootHub.ui8ReportSize);
+            USBHCDPipeSchedule(ui32Pipe, (uint8_t *)&g_ui32HubChanges, (uint32_t)g_sRootHub.ui8ReportSize);
             break;
         }
 
         //
         // Called when new data is available on the interrupt IN pipe.
         //
-        case USB_EVENT_RX_AVAILABLE:
-        {
+        case USB_EVENT_RX_AVAILABLE: {
             //
             // For data transfers on INT IN endpoints, we need to acknowledge
             // the data from this callback.
@@ -538,17 +501,13 @@ HubIntINCallback(uint32_t ui32Pipe, uint32_t ui32Event)
             // Send the report data to the USB host hub device class driver if
             // we have been given a callback function.
             //
-            if(g_sRootHub.pfnCallback)
-            {
-                g_sRootHub.pfnCallback((void *)g_sRootHub.ui32CBData,
-                                       USB_EVENT_RX_AVAILABLE,
-                                       ui32Pipe, &g_ui32HubChanges);
+            if (g_sRootHub.pfnCallback) {
+                g_sRootHub.pfnCallback((tHubInstance *)g_sRootHub.ui32CBData, USB_EVENT_RX_AVAILABLE, ui32Pipe, &g_ui32HubChanges);
             }
 
             break;
         }
-        case USB_EVENT_ERROR:
-        {
+        case USB_EVENT_ERROR: {
             break;
         }
     }
@@ -559,9 +518,7 @@ HubIntINCallback(uint32_t ui32Pipe, uint32_t ui32Event)
 // Query the class-specific hub descriptor.
 //
 //*****************************************************************************
-static bool
-GetHubDescriptor(tUsbHubDescriptor *psDesc)
-{
+static bool GetHubDescriptor(tUsbHubDescriptor *psDesc) {
     uint32_t ui32Read;
     tUSBRequest sSetupPacket;
     tUSBHostDevice *psDevice;
@@ -574,8 +531,7 @@ GetHubDescriptor(tUsbHubDescriptor *psDesc)
     //
     // This is a standard OUT request.
     //
-    sSetupPacket.bmRequestType = USB_RTYPE_DIR_IN | USB_RTYPE_CLASS |
-                                 USB_RTYPE_DEVICE;
+    sSetupPacket.bmRequestType = USB_RTYPE_DIR_IN | USB_RTYPE_CLASS | USB_RTYPE_DEVICE;
 
     //
     // Set the fields to get the hub descriptor.  Initially, we request only
@@ -585,29 +541,27 @@ GetHubDescriptor(tUsbHubDescriptor *psDesc)
     // and we only support up to MAX_USB_DEVICES.
     //
     sSetupPacket.bRequest = USBREQ_GET_DESCRIPTOR;
-    sSetupPacket.wValue = (USB_DTYPE_HUB << 8);
-    sSetupPacket.wIndex = 0;
-    sSetupPacket.wLength = sizeof(tUsbHubDescriptor);
+    sSetupPacket.wValue   = (USB_DTYPE_HUB << 8);
+    sSetupPacket.wIndex   = 0;
+    sSetupPacket.wLength  = sizeof(tUsbHubDescriptor);
 
     //
     // Send the request.
     //
-    ui32Read = USBHCDControlTransfer(0, &sSetupPacket, psDevice,
-                                (void *)psDesc, sizeof(tUsbHubDescriptor),
-                                psDevice->sDeviceDescriptor.bMaxPacketSize0);
+    ui32Read = USBHCDControlTransfer(
+        0, &sSetupPacket, psDevice, (uint8_t *)psDesc, sizeof(tUsbHubDescriptor), psDevice->sDeviceDescriptor.bMaxPacketSize0);
 
-     //
-     // Make sure we got at least some data.
-     //
-     if(ui32Read == 0)
-     {
-         return(false);
-     }
+    //
+    // Make sure we got at least some data.
+    //
+    if (ui32Read == 0) {
+        return (false);
+    }
 
     //
     // All is well.
     //
-    return(true);
+    return (true);
 }
 
 //*****************************************************************************
@@ -616,9 +570,7 @@ GetHubDescriptor(tUsbHubDescriptor *psDesc)
 // has enumerated a new hub device.
 //
 //*****************************************************************************
-static void *
-HubDriverOpen(tUSBHostDevice *psDevice)
-{
+static void *HubDriverOpen(tUSBHostDevice *psDevice) {
     tEndpointDescriptor *psEndpointDescriptor;
     tInterfaceDescriptor *psInterface;
     tUsbHubDescriptor sHubDesc;
@@ -629,50 +581,42 @@ HubDriverOpen(tUSBHostDevice *psDevice)
     // If we are already talking to a hub, fail the call.  We only support
     // a single hub.
     //
-    if(g_sRootHub.ui32Flags & USBLIB_HUB_ACTIVE)
-    {
-        return(0);
+    if (g_sRootHub.ui32Flags & USBLIB_HUB_ACTIVE) {
+        return (0);
     }
 
     //
     // Get pointers to the device descriptors we need to look at.
     //
-    psInterface = USBDescGetInterface(psDevice->psConfigDescriptor, 0, 0);
-    psEndpointDescriptor = USBDescGetInterfaceEndpoint(psInterface, 0,
-                                      psDevice->ui32ConfigDescriptorSize);
+    psInterface          = USBDescGetInterface(psDevice->psConfigDescriptor, 0, 0);
+    psEndpointDescriptor = USBDescGetInterfaceEndpoint(psInterface, 0, psDevice->ui32ConfigDescriptorSize);
 
     //
     // If there are no endpoints, something is wrong since a hub must have
     // a single INT endpoint for signaling.
     //
-    if(psEndpointDescriptor == 0)
-    {
+    if (psEndpointDescriptor == 0) {
         return 0;
     }
 
     //
     // Make sure we really are talking to a hub.
     //
-    if((psInterface->bInterfaceClass != USB_CLASS_HUB) ||
-       (psInterface->bInterfaceSubClass != 0))
-    {
+    if ((psInterface->bInterfaceClass != USB_CLASS_HUB) || (psInterface->bInterfaceSubClass != 0)) {
         //
         // Something is wrong - this isn't a hub or, if it is, we don't
         // understand the protocol it is using.
         //
-        return(0);
+        return (0);
     }
 
     //
     // Remember that this is a high speed hub with either single or multiple
     // transaction translators.
     //
-    if(psInterface->bInterfaceProtocol == USB_HUB_PROTOCOL_SINGLE)
-    {
+    if (psInterface->bInterfaceProtocol == USB_HUB_PROTOCOL_SINGLE) {
         g_sRootHub.ui32Flags |= USBLIB_HUB_HS;
-    }
-    else if(psInterface->bInterfaceProtocol == USB_HUB_PROTOCOL_MULTI)
-    {
+    } else if (psInterface->bInterfaceProtocol == USB_HUB_PROTOCOL_MULTI) {
         g_sRootHub.ui32Flags |= USBLIB_HUB_HS | USBLIB_HUB_MULTI_TT;
     }
 
@@ -684,34 +628,27 @@ HubDriverOpen(tUSBHostDevice *psDevice)
     //
     // A hub must support an interrupt endpoint so check this.
     //
-    if((psEndpointDescriptor->bmAttributes & USB_EP_ATTR_TYPE_M) ==
-       USB_EP_ATTR_INT)
-    {
+    if ((psEndpointDescriptor->bmAttributes & USB_EP_ATTR_TYPE_M) == USB_EP_ATTR_INT) {
         //
         // The endpoint is the correct type. Is it an IN endpoint?
         //
-        if(psEndpointDescriptor->bEndpointAddress & USB_EP_DESC_IN)
-        {
+        if (psEndpointDescriptor->bEndpointAddress & USB_EP_DESC_IN) {
             //
             // Yes - all is well with the hub endpoint so allocate a pipe to
             // handle traffic from the hub.
             //
-            g_sRootHub.ui32IntInPipe = USBHCDPipeAlloc(0, USBHCD_PIPE_INTR_IN,
-                                                       psDevice,
-                                                       HubIntINCallback);
+            g_sRootHub.ui32IntInPipe = USBHCDPipeAlloc(0, USBHCD_PIPE_INTR_IN, psDevice, HubIntINCallback);
             USBHCDPipeConfig(g_sRootHub.ui32IntInPipe,
                              psEndpointDescriptor->wMaxPacketSize,
                              psEndpointDescriptor->bInterval,
-                             psEndpointDescriptor->bEndpointAddress &
-                             USB_EP_DESC_NUM_M);
+                             psEndpointDescriptor->bEndpointAddress & USB_EP_DESC_NUM_M);
         }
     }
 
     //
     // Did we allocate the endpoint successfully?
     //
-    if(!g_sRootHub.ui32IntInPipe)
-    {
+    if (!g_sRootHub.ui32IntInPipe) {
         //
         // No - return an error.
         //
@@ -722,27 +659,21 @@ HubDriverOpen(tUSBHostDevice *psDevice)
     // Assuming we have a callback, call it to tell the owner that a hub is
     // now connected.
     //
-    if(g_sRootHub.pfnCallback != 0)
-    {
-        g_sRootHub.pfnCallback((void *)g_sRootHub.ui32CBData,
-                               USB_EVENT_CONNECTED, (uint32_t)&g_sRootHub, 0);
+    if (g_sRootHub.pfnCallback != 0) {
+        g_sRootHub.pfnCallback((tHubInstance *)g_sRootHub.ui32CBData, USB_EVENT_CONNECTED, (uint32_t)&g_sRootHub, 0);
     }
 
     //
     // Get the hub descriptor and store information we'll need for later.
     //
     bRetcode = GetHubDescriptor(&sHubDesc);
-    if(bRetcode)
-    {
-
+    if (bRetcode) {
         //
         // We read the descriptor successfully so extract the parts we need.
         //
-        g_sRootHub.ui8NumPorts = sHubDesc.bNbrPorts;
+        g_sRootHub.ui8NumPorts            = sHubDesc.bNbrPorts;
         g_sRootHub.ui16HubCharacteristics = sHubDesc.wHubCharacteristics;
-        g_sRootHub.ui8NumPortsInUse =
-            (sHubDesc.bNbrPorts > MAX_USB_DEVICES) ? MAX_USB_DEVICES :
-                                                     sHubDesc.bNbrPorts;
+        g_sRootHub.ui8NumPortsInUse       = (sHubDesc.bNbrPorts > MAX_USB_DEVICES) ? MAX_USB_DEVICES : sHubDesc.bNbrPorts;
 
         //
         // The size of the status change report that the hub sends is dependent
@@ -756,26 +687,21 @@ HubDriverOpen(tUSBHostDevice *psDevice)
         //
         // Enable power to all ports on the hub.
         //
-        for(ui32Loop = 1; ui32Loop <= sHubDesc.bNbrPorts; ui32Loop++)
-        {
+        for (ui32Loop = 1; ui32Loop <= sHubDesc.bNbrPorts; ui32Loop++) {
             //
             // Turn on power to this port.
             //
-            HubSetPortFeature(&g_sRootHub, ui32Loop,
-                              HUB_FEATURE_PORT_POWER);
+            HubSetPortFeature(&g_sRootHub, ui32Loop, HUB_FEATURE_PORT_POWER);
         }
 
         //
         // Clear out our port state structures.
         //
-        for(ui32Loop = 0; ui32Loop < MAX_USB_DEVICES; ui32Loop++)
-        {
+        for (ui32Loop = 0; ui32Loop < MAX_USB_DEVICES; ui32Loop++) {
             g_sRootHub.psPorts[ui32Loop].bChanged = false;
-            g_sRootHub.psPorts[ui32Loop].iState = ePortIdle;
+            g_sRootHub.psPorts[ui32Loop].iState   = ePortIdle;
         }
-    }
-    else
-    {
+    } else {
         //
         // Oops - we can't read the hub descriptor!  Tidy up and return
         // an error.
@@ -783,7 +709,7 @@ HubDriverOpen(tUSBHostDevice *psDevice)
         USBHCDPipeFree(g_sRootHub.ui32IntInPipe);
         g_sRootHub.pfnCallback = 0;
         g_sRootHub.ui32Flags &= ~USBLIB_HUB_ACTIVE;
-        return(0);
+        return (0);
     }
 
     //
@@ -795,7 +721,7 @@ HubDriverOpen(tUSBHostDevice *psDevice)
     //
     // Return our instance data pointer to the caller to use as a handle.
     //
-    return((void *)&g_sRootHub);
+    return ((void *)&g_sRootHub);
 }
 
 //*****************************************************************************
@@ -803,46 +729,36 @@ HubDriverOpen(tUSBHostDevice *psDevice)
 // Close an instance of the hub driver.
 //
 //*****************************************************************************
-static void
-HubDriverClose(void *pvHubDevice)
-{
+static void HubDriverClose(void *pvHubDevice) {
     uint32_t ui32Loop;
 
     //
     // No device so just exit.
     //
-    if(g_sRootHub.psDevice == 0)
-    {
+    if (g_sRootHub.psDevice == 0) {
         return;
     }
 
     //
     // Disconnect any devices that are currently connected to the hub.
     //
-    for(ui32Loop = 0; ui32Loop < MAX_USB_DEVICES; ui32Loop++)
-    {
+    for (ui32Loop = 0; ui32Loop < MAX_USB_DEVICES; ui32Loop++) {
         //
         // Does this port have a device connected to it that we have previously
         // reported to the host control layer?h
         //
-        if((g_sRootHub.psPorts[ui32Loop].iState == ePortActive) ||
-           (g_sRootHub.psPorts[ui32Loop].iState == ePortResetWait) ||
-           (g_sRootHub.psPorts[ui32Loop].iState == ePortEnumerated) ||
-           (g_sRootHub.psPorts[ui32Loop].iState == ePortError))
-        {
+        if ((g_sRootHub.psPorts[ui32Loop].iState == ePortActive) || (g_sRootHub.psPorts[ui32Loop].iState == ePortResetWait) ||
+            (g_sRootHub.psPorts[ui32Loop].iState == ePortEnumerated) || (g_sRootHub.psPorts[ui32Loop].iState == ePortError)) {
             //
             // Yes - tell the host controller to disconnect the device.
             //
-            USBHCDHubDeviceDisconnected(0,
-                g_sRootHub.psPorts[ui32Loop].ui32DevHandle);
-
+            USBHCDHubDeviceDisconnected(0, g_sRootHub.psPorts[ui32Loop].ui32DevHandle);
         }
 
         //
         // Make sure that the state returns to idle.
         //
         g_sRootHub.psPorts[ui32Loop].iState = ePortIdle;
-
     }
 
     //
@@ -863,19 +779,15 @@ HubDriverClose(void *pvHubDevice)
     //
     // Free the Interrupt IN pipe.
     //
-    if(g_sRootHub.ui32IntInPipe != 0)
-    {
+    if (g_sRootHub.ui32IntInPipe != 0) {
         USBHCDPipeFree(g_sRootHub.ui32IntInPipe);
     }
 
     //
     // If the callback exists, call it with a DISCONNECTED event.
     //
-    if(g_sRootHub.pfnCallback != 0)
-    {
-        g_sRootHub.pfnCallback((void *)g_sRootHub.ui32CBData,
-                               USB_EVENT_DISCONNECTED, (uint32_t)&g_sRootHub,
-                               0);
+    if (g_sRootHub.pfnCallback != 0) {
+        g_sRootHub.pfnCallback((tHubInstance *)g_sRootHub.ui32CBData, USB_EVENT_DISCONNECTED, (uint32_t)&g_sRootHub, 0);
     }
 }
 
@@ -885,14 +797,11 @@ HubDriverClose(void *pvHubDevice)
 // signaling for a given port.
 //
 //*****************************************************************************
-static void
-HubDriverReset(uint8_t ui8Port, bool bResetActive)
-{
+static void HubDriverReset(uint8_t ui8Port, bool bResetActive) {
     //
     // Did the reset sequence end or begin?
     //
-    if(!bResetActive)
-    {
+    if (!bResetActive) {
         //
         // The reset ended.  Now wait for at least 10ms before signaling
         // USB enumeration code that a new device is waiting to be enumerated.
@@ -903,16 +812,12 @@ HubDriverReset(uint8_t ui8Port, bool bResetActive)
         // Set the wait to 10ms (10 frames) from now.
         //
         g_sRootHub.psPorts[ui8Port].ui32Count = 10;
-    }
-    else
-    {
+    } else {
         //
         // Was this device previously active?
         //
-        if(g_sRootHub.psPorts[ui8Port].iState == ePortActive)
-        {
-            USBHCDHubDeviceDisconnected(0,
-                g_sRootHub.psPorts[ui8Port].ui32DevHandle);
+        if (g_sRootHub.psPorts[ui8Port].iState == ePortActive) {
+            USBHCDHubDeviceDisconnected(0, g_sRootHub.psPorts[ui8Port].ui32DevHandle);
         }
 
         //
@@ -928,9 +833,7 @@ HubDriverReset(uint8_t ui8Port, bool bResetActive)
 // appropriate downstream port.
 //
 //*****************************************************************************
-static void
-HubDriverDeviceReset(uint8_t ui8Port)
-{
+static void HubDriverDeviceReset(uint8_t ui8Port) {
     DEBUG_OUTPUT("Starting enumeration for port %d\n", ui8Port);
 
     //
@@ -961,9 +864,7 @@ HubDriverDeviceReset(uint8_t ui8Port)
 // device enumerated.
 //
 //*****************************************************************************
-static void
-HubDriverDeviceConnect(uint8_t ui8Port)
-{
+static void HubDriverDeviceConnect(uint8_t ui8Port) {
     DEBUG_OUTPUT("HubDriverDeviceConnect\n");
 
     //
@@ -990,34 +891,26 @@ HubDriverDeviceConnect(uint8_t ui8Port)
 // USB host code know so that it can free device resources.
 //
 //*****************************************************************************
-static void
-HubDriverDeviceDisconnect(uint8_t ui8Port)
-{
+static void HubDriverDeviceDisconnect(uint8_t ui8Port) {
     //
     // This is a device we are currently managing.  Have we already informed
     // the host controller that it is present?
     //
-    if((g_sRootHub.psPorts[ui8Port].iState == ePortActive) ||
-       (g_sRootHub.psPorts[ui8Port].iState == ePortResetWait) ||
-       (g_sRootHub.psPorts[ui8Port].iState == ePortEnumerated) ||
-       (g_sRootHub.psPorts[ui8Port].iState == ePortError))
-    {
+    if ((g_sRootHub.psPorts[ui8Port].iState == ePortActive) || (g_sRootHub.psPorts[ui8Port].iState == ePortResetWait) ||
+        (g_sRootHub.psPorts[ui8Port].iState == ePortEnumerated) || (g_sRootHub.psPorts[ui8Port].iState == ePortError)) {
         //
         // Yes - tell the host controller that the device is not longer
         // connected.
         //
-        USBHCDHubDeviceDisconnected(0,
-                                g_sRootHub.psPorts[ui8Port].ui32DevHandle);
+        USBHCDHubDeviceDisconnected(0, g_sRootHub.psPorts[ui8Port].ui32DevHandle);
     }
 
     //
     // If the device was being enumerated, make sure we clear the flag
     // indicating that an enumeration is still ongoing.
     //
-    if((g_sRootHub.psPorts[ui8Port].iState == ePortResetActive) ||
-       (g_sRootHub.psPorts[ui8Port].iState == ePortResetWait) ||
-       (g_sRootHub.psPorts[ui8Port].iState == ePortActive))
-    {
+    if ((g_sRootHub.psPorts[ui8Port].iState == ePortResetActive) || (g_sRootHub.psPorts[ui8Port].iState == ePortResetWait) ||
+        (g_sRootHub.psPorts[ui8Port].iState == ePortActive)) {
         g_sRootHub.bEnumerationBusy = false;
     }
 
@@ -1033,9 +926,7 @@ HubDriverDeviceDisconnect(uint8_t ui8Port)
 // the hub port state machine.
 //
 //*****************************************************************************
-void
-USBHHubMain(void)
-{
+void USBHHubMain(void) {
     uint16_t ui16Status, ui16Changed;
     uint_fast8_t ui8Port;
     bool bRetcode;
@@ -1043,28 +934,25 @@ USBHHubMain(void)
     //
     // If the hub is not present, just return.
     //
-    if((g_sRootHub.ui32Flags & USBLIB_HUB_ACTIVE) == 0)
-    {
+    if ((g_sRootHub.ui32Flags & USBLIB_HUB_ACTIVE) == 0) {
         return;
     }
 
     //
     // Initialize the status variables.
     //
-    ui16Status = 0;
+    ui16Status  = 0;
     ui16Changed = 0;
 
     //
     // The hub is active and something changed. Check to see which port changed
     // state and handle as necessary.
     //
-    for(ui8Port = 0; ui8Port <= g_sRootHub.ui8NumPortsInUse; ui8Port++)
-    {
+    for (ui8Port = 0; ui8Port <= g_sRootHub.ui8NumPortsInUse; ui8Port++) {
         //
         // Decrement any wait counter if there is one present.
         //
-        if(g_sRootHub.psPorts[ui8Port].ui32Count != 0)
-        {
+        if (g_sRootHub.psPorts[ui8Port].ui32Count != 0) {
             g_sRootHub.psPorts[ui8Port].ui32Count--;
         }
 
@@ -1072,10 +960,8 @@ USBHHubMain(void)
         // Is this port waiting to be enumerated and is the last device
         // enumeration finished?
         //
-        if((g_sRootHub.psPorts[ui8Port].iState == ePortConnected) &&
-           (!g_sRootHub.bEnumerationBusy) &&
-           (g_sRootHub.psPorts[ui8Port].ui32Count == 0))
-        {
+        if ((g_sRootHub.psPorts[ui8Port].iState == ePortConnected) && (!g_sRootHub.bEnumerationBusy) &&
+            (g_sRootHub.psPorts[ui8Port].ui32Count == 0)) {
             //
             // Yes - start the enumeration processing for this device.
             //
@@ -1086,9 +972,7 @@ USBHHubMain(void)
         // If the state is ePortResetWait then the hub is waiting before
         // accessing device as the USB 2.0 specification requires.
         //
-        if((g_sRootHub.psPorts[ui8Port].iState == ePortResetWait) &&
-           (g_sRootHub.psPorts[ui8Port].ui32Count == 0))
-        {
+        if ((g_sRootHub.psPorts[ui8Port].iState == ePortResetWait) && (g_sRootHub.psPorts[ui8Port].ui32Count == 0)) {
             //
             // Start the enumeration process if the timeout has passed and
             // the hub is waiting to start enumerating the device.
@@ -1099,31 +983,25 @@ USBHHubMain(void)
             // Call the main host controller layer to have it enumerate the
             // newly connected device.
             //
-            g_sRootHub.psPorts[ui8Port].ui32DevHandle =
-                USBHCDHubDeviceConnected(0, 1, ui8Port,
-                                        g_sRootHub.psPorts[ui8Port].ui32Speed);
+            g_sRootHub.psPorts[ui8Port].ui32DevHandle = USBHCDHubDeviceConnected(0, 1, ui8Port, g_sRootHub.psPorts[ui8Port].ui32Speed);
         }
 
         //
         // If an enumeration is in progress and the loop is not on the port
         // being enumerated then skip the port.
         //
-        if(g_sRootHub.bEnumerationBusy &&
-           (g_sRootHub.ui8EnumIdx != ui8Port))
-        {
+        if (g_sRootHub.bEnumerationBusy && (g_sRootHub.ui8EnumIdx != ui8Port)) {
             continue;
         }
 
         //
         // Did something change for this particular port?
         //
-        if(g_ui32ChangeFlags & (1 << ui8Port))
-        {
+        if (g_ui32ChangeFlags & (1 << ui8Port)) {
             //
             // Yes - query the port status.
             //
-            bRetcode = HubGetPortStatus(&g_sRootHub, ui8Port, &ui16Status,
-                                        &ui16Changed);
+            bRetcode = HubGetPortStatus(&g_sRootHub, ui8Port, &ui16Status, &ui16Changed);
 
             //
             // Clear this change with the USB interrupt temporarily disabled to
@@ -1137,8 +1015,7 @@ USBHHubMain(void)
             //
             // If there was an error, go on and look at the next bit.
             //
-            if(!bRetcode)
-            {
+            if (!bRetcode) {
                 continue;
             }
 
@@ -1149,30 +1026,25 @@ USBHHubMain(void)
             //
             // Was a device connected to or disconnected from the port?
             //
-            if(ui16Changed & HUB_PORT_CHANGE_DEVICE_PRESENT)
-            {
+            if (ui16Changed & HUB_PORT_CHANGE_DEVICE_PRESENT) {
                 DEBUG_OUTPUT("Connection change on port %d\n", ui8Port);
 
                 //
                 // Clear the condition.
                 //
-                HubClearPortFeature(&g_sRootHub, ui8Port,
-                                    HUB_FEATURE_C_PORT_CONNECTION);
+                HubClearPortFeature(&g_sRootHub, ui8Port, HUB_FEATURE_C_PORT_CONNECTION);
 
                 //
                 // Was a device connected or disconnected?
                 //
-                if(ui16Status & HUB_PORT_STATUS_DEVICE_PRESENT)
-                {
+                if (ui16Status & HUB_PORT_STATUS_DEVICE_PRESENT) {
                     DEBUG_OUTPUT("Connected\n");
 
                     //
                     // A device was connected.
                     //
                     HubDriverDeviceConnect(ui8Port);
-                }
-                else
-                {
+                } else {
                     DEBUG_OUTPUT("Disconnected\n");
 
                     //
@@ -1185,43 +1057,32 @@ USBHHubMain(void)
             //
             // Did a reset on the port complete?
             //
-            if(ui16Changed & HUB_PORT_CHANGE_RESET)
-            {
+            if (ui16Changed & HUB_PORT_CHANGE_RESET) {
                 //
                 // Clear the condition.
                 //
-                HubClearPortFeature(&g_sRootHub, ui8Port,
-                                    HUB_FEATURE_C_PORT_RESET);
+                HubClearPortFeature(&g_sRootHub, ui8Port, HUB_FEATURE_C_PORT_RESET);
 
                 //
                 // Yes - query the port status.
                 //
-                bRetcode = HubGetPortStatus(&g_sRootHub, ui8Port,
-                                            &ui16Status, &ui16Changed);
+                bRetcode = HubGetPortStatus(&g_sRootHub, ui8Port, &ui16Status, &ui16Changed);
 
-                DEBUG_OUTPUT("Reset %s for port %d\n",
-                        ((ui16Status & HUB_PORT_STATUS_RESET) ? "asserted" :
-                        "deasserted"), ui8Port);
+                DEBUG_OUTPUT("Reset %s for port %d\n", ((ui16Status & HUB_PORT_STATUS_RESET) ? "asserted" : "deasserted"), ui8Port);
 
                 //
                 // Handle the reset case.
                 //
-                HubDriverReset(ui8Port, (ui16Status & HUB_PORT_STATUS_RESET) ?
-                               true : false);
+                HubDriverReset(ui8Port, (ui16Status & HUB_PORT_STATUS_RESET) ? true : false);
 
                 //
                 // A device was connected.
                 //
-                if(ui16Status & HUB_PORT_STATUS_LOW_SPEED)
-                {
+                if (ui16Status & HUB_PORT_STATUS_LOW_SPEED) {
                     USBHubPortSpeedSet(ui8Port, USB_EP_SPEED_LOW);
-                }
-                else if(ui16Status & HUB_PORT_STATUS_HIGH_SPEED)
-                {
+                } else if (ui16Status & HUB_PORT_STATUS_HIGH_SPEED) {
                     USBHubPortSpeedSet(ui8Port, USB_EP_SPEED_HIGH);
-                }
-                else
-                {
+                } else {
                     USBHubPortSpeedSet(ui8Port, USB_EP_SPEED_FULL);
                 }
             }
@@ -1229,43 +1090,37 @@ USBHHubMain(void)
             //
             // Did an over-current reset on the port complete?
             //
-            if(ui16Changed & HUB_PORT_CHANGE_OVER_CURRENT)
-            {
+            if (ui16Changed & HUB_PORT_CHANGE_OVER_CURRENT) {
                 DEBUG_OUTPUT("Port %d over current.\n", ui8Port);
 
                 //
                 // Currently we ignore this and just clear the condition.
                 //
-                HubClearPortFeature(&g_sRootHub, ui8Port,
-                                    HUB_FEATURE_C_PORT_OVER_CURRENT);
+                HubClearPortFeature(&g_sRootHub, ui8Port, HUB_FEATURE_C_PORT_OVER_CURRENT);
             }
 
             //
             // Has the port been enabled or disabled?
             //
-            if(ui16Changed & HUB_PORT_CHANGE_ENABLED)
-            {
+            if (ui16Changed & HUB_PORT_CHANGE_ENABLED) {
                 DEBUG_OUTPUT("Enable change for port %d.\n", ui8Port);
 
                 //
                 // Currently we ignore this and just clear the condition.
                 //
-                HubClearPortFeature(&g_sRootHub, ui8Port,
-                                    HUB_FEATURE_C_PORT_ENABLE);
+                HubClearPortFeature(&g_sRootHub, ui8Port, HUB_FEATURE_C_PORT_ENABLE);
             }
 
             //
             // Has the port been suspended or resumed?
             //
-            if(ui16Changed & HUB_PORT_CHANGE_SUSPENDED)
-            {
+            if (ui16Changed & HUB_PORT_CHANGE_SUSPENDED) {
                 DEBUG_OUTPUT("Suspend change for port %d.\n", ui8Port);
 
                 //
                 // Currently we ignore this and just clear the condition.
                 //
-                HubClearPortFeature(&g_sRootHub, ui8Port,
-                                    HUB_FEATURE_C_PORT_SUSPEND);
+                HubClearPortFeature(&g_sRootHub, ui8Port, HUB_FEATURE_C_PORT_SUSPEND);
             }
         }
     }
@@ -1288,9 +1143,7 @@ USBHHubMain(void)
 //! \return None.
 //
 //*****************************************************************************
-void
-USBHHubEnumerationComplete(uint8_t ui8Hub, uint8_t ui8Port)
-{
+void USBHHubEnumerationComplete(uint8_t ui8Hub, uint8_t ui8Port) {
     DEBUG_OUTPUT("Enumeration complete for hub %d, port %d\n", ui8Hub, ui8Port);
 
     //
@@ -1323,9 +1176,7 @@ USBHHubEnumerationComplete(uint8_t ui8Hub, uint8_t ui8Port)
 //! \return None.
 //
 //*****************************************************************************
-void
-USBHHubEnumerationError(uint8_t ui8Hub, uint8_t ui8Port)
-{
+void USBHHubEnumerationError(uint8_t ui8Hub, uint8_t ui8Port) {
     DEBUG_OUTPUT("Enumeration error for hub %d, port %d\n", ui8Hub, ui8Port);
 
     //
@@ -1371,16 +1222,13 @@ USBHHubEnumerationError(uint8_t ui8Hub, uint8_t ui8Port)
 //! this call, this function returns zero.
 //
 //*****************************************************************************
-tHubInstance *
-USBHHubOpen(tUSBHHubCallback pfnCallback)
-{
+tHubInstance *USBHHubOpen(tUSBHHubCallback pfnCallback) {
     //
     // Only one hub is supported.
     //
-    if(g_sRootHub.pfnCallback)
-    {
+    if (g_sRootHub.pfnCallback) {
         DEBUG_OUTPUT("USBHHubOpen failed - already connected.\n");
-        return(0);
+        return (0);
     }
 
     //
@@ -1393,7 +1241,7 @@ USBHHubOpen(tUSBHHubCallback pfnCallback)
     //
     // Return the device instance pointer.
     //
-    return(&g_sRootHub);
+    return (&g_sRootHub);
 }
 
 //*****************************************************************************
@@ -1412,13 +1260,11 @@ USBHHubOpen(tUSBHHubCallback pfnCallback)
 //! \return None.
 //
 //*****************************************************************************
-void
-USBHHubClose(tHubInstance *psHubInstance)
-{
+void USBHHubClose(tHubInstance *psHubInstance) {
     //
     // Forget the instance pointer and callback.
     //
-    psHubInstance->psDevice = 0;
+    psHubInstance->psDevice    = 0;
     psHubInstance->pfnCallback = 0;
 
     DEBUG_OUTPUT("USBHHubClose completed.\n");
@@ -1430,17 +1276,14 @@ USBHHubClose(tHubInstance *psHubInstance)
 // function that should not be called by the application.
 //
 //*****************************************************************************
-void
-USBHHubInit(void)
-{
+void USBHHubInit(void) {
     //
     // Initialize Hub state.
     //
     g_ui32ChangeFlags = 0;
-    g_ui32HubChanges = 0;
+    g_ui32HubChanges  = 0;
 
-    if(g_sRootHub.psDevice != 0)
-    {
+    if (g_sRootHub.psDevice != 0) {
         //
         // Save the USB interrupt number.
         //
@@ -1449,8 +1292,7 @@ USBHHubInit(void)
         //
         // These devices have a different USB interrupt number.
         //
-        if(CLASS_IS_TM4C129)
-        {
+        if (CLASS_IS_TM4C129) {
             g_sRootHub.ui32IntNum = INT_USB0_TM4C129;
         }
     }
@@ -1478,13 +1320,11 @@ USBHHubInit(void)
 //! - \b USBHCD_LPM_PENDING - There is already an LPM request pending.
 //
 //*****************************************************************************
-uint32_t
-USBHHubLPMSleep(tHubInstance *psHubInstance)
-{
+uint32_t USBHHubLPMSleep(tHubInstance *psHubInstance) {
     //
     // Call the host controller function to send the sleep command.
     //
-    return(USBHCDLPMSleep(psHubInstance->psDevice));
+    return (USBHCDLPMSleep(psHubInstance->psDevice));
 }
 
 //*****************************************************************************
@@ -1506,13 +1346,11 @@ USBHHubLPMSleep(tHubInstance *psHubInstance)
 //! - \b USBHCD_LPM_PENDING - The last LPM request has not completed.
 //
 //*****************************************************************************
-uint32_t
-USBHHubLPMStatus(tHubInstance *psHubInstance)
-{
+uint32_t USBHHubLPMStatus(tHubInstance *psHubInstance) {
     //
     // Call the host controller function to get the current LPM status.
     //
-    return(USBHCDLPMStatus(psHubInstance->psDevice));
+    return (USBHCDLPMStatus(psHubInstance->psDevice));
 }
 
 //*****************************************************************************

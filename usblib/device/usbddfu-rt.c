@@ -4,20 +4,20 @@
 //
 // Copyright (c) 2010-2020 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
-// 
+//
 // Texas Instruments (TI) is supplying this software for use solely and
 // exclusively on TI's microcontroller products. The software is owned by
 // TI and/or its suppliers, and is protected under applicable copyright
 // laws. You may not combine this software with "viral" open-source
 // software in order to form a larger program.
-// 
+//
 // THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
 // NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 // A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
 // CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
 // DAMAGES, FOR ANY REASON WHATSOEVER.
-// 
+//
 // This is part of revision 2.2.0.295 of the Tiva USB Library.
 //
 //*****************************************************************************
@@ -55,24 +55,23 @@
 // a part of a composite device and cannot be instantiated on its own.
 //
 //*****************************************************************************
-const uint8_t g_pui8DFUDeviceDescriptor[] =
-{
-    18,                             // Size of this structure.
-    USB_DTYPE_DEVICE,               // Type of this structure.
-    USBShort(0x110),                // USB version 1.1 (if we say 2.0, hosts
-                                    // assume
-                                    // high-speed - see USB 2.0 spec 9.2.6.6)
-    USB_CLASS_VEND_SPECIFIC,        // USB Device Class
-    0,                              // USB Device Sub-class
-    0,                              // USB Device protocol
-    64,                             // Maximum packet size for default pipe.
-    USBShort(0),                    // Vendor ID (VID).
-    USBShort(0),                    // Product ID (PID).
-    USBShort(0),                    // Device Release Number BCD.
-    0,                              // Manufacturer string identifier.
-    0,                              // Product string identifier.
-    0,                              // Product serial number.
-    1                               // Number of configurations.
+const uint8_t g_pui8DFUDeviceDescriptor[] = {
+    18,                      // Size of this structure.
+    USB_DTYPE_DEVICE,        // Type of this structure.
+    USBShort(0x110),         // USB version 1.1 (if we say 2.0, hosts
+                             // assume
+                             // high-speed - see USB 2.0 spec 9.2.6.6)
+    USB_CLASS_VEND_SPECIFIC, // USB Device Class
+    0,                       // USB Device Sub-class
+    0,                       // USB Device protocol
+    64,                      // Maximum packet size for default pipe.
+    USBShort(0),             // Vendor ID (VID).
+    USBShort(0),             // Product ID (PID).
+    USBShort(0),             // Device Release Number BCD.
+    0,                       // Manufacturer string identifier.
+    0,                       // Product string identifier.
+    0,                       // Product serial number.
+    1                        // Number of configurations.
 };
 
 //*****************************************************************************
@@ -82,22 +81,21 @@ const uint8_t g_pui8DFUDeviceDescriptor[] =
 // to the composite device.
 //
 //*****************************************************************************
-uint8_t g_pui8DFUConfigDescriptor[] =
-{
+uint8_t g_pui8DFUConfigDescriptor[] = {
     //
     // Configuration descriptor header.
     //
-    9,                              // Size of the configuration descriptor.
-    USB_DTYPE_CONFIGURATION,        // Type of this descriptor.
-    USBShort(27),                   // The total size of this full structure.
-    1,                              // The number of interfaces in this
-                                    // configuration.
-    1,                              // The unique value for this configuration.
-    0,                              // The string identifier that describes
-                                    // this configuration.
-    USB_CONF_ATTR_SELF_PWR,         // Bus Powered, Self Powered, remote wake
-                                    // up.
-    250,                            // The maximum power in 2mA increments.
+    9,                       // Size of the configuration descriptor.
+    USB_DTYPE_CONFIGURATION, // Type of this descriptor.
+    USBShort(27),            // The total size of this full structure.
+    1,                       // The number of interfaces in this
+                             // configuration.
+    1,                       // The unique value for this configuration.
+    0,                       // The string identifier that describes
+                             // this configuration.
+    USB_CONF_ATTR_SELF_PWR,  // Bus Powered, Self Powered, remote wake
+                             // up.
+    250,                     // The maximum power in 2mA increments.
 };
 
 //*****************************************************************************
@@ -105,21 +103,20 @@ uint8_t g_pui8DFUConfigDescriptor[] =
 // The DFU runtime interface descriptor.
 //
 //*****************************************************************************
-uint8_t g_pui8DFUInterface[DFUINTERFACE_SIZE] =
-{
+uint8_t g_pui8DFUInterface[DFUINTERFACE_SIZE] = {
     //
     // Interface descriptor for runtime DFU operation.
     //
-    9,                              // Length of this descriptor.
-    USB_DTYPE_INTERFACE,            // This is an interface descriptor.
-    0,                              // Interface number .
-    0,                              // Alternate setting number.
-    0,                              // Number of endpoints (only endpoint 0
-                                    // used)
-    USB_CLASS_APP_SPECIFIC,         // Application specific interface class
-    USB_DFU_SUBCLASS,               // Device Firmware Upgrade subclass
-    USB_DFU_RUNTIME_PROTOCOL,       // DFU runtime protocol
-    0,                              // No string descriptor for this interface.
+    9,                        // Length of this descriptor.
+    USB_DTYPE_INTERFACE,      // This is an interface descriptor.
+    0,                        // Interface number .
+    0,                        // Alternate setting number.
+    0,                        // Number of endpoints (only endpoint 0
+                              // used)
+    USB_CLASS_APP_SPECIFIC,   // Application specific interface class
+    USB_DFU_SUBCLASS,         // Device Firmware Upgrade subclass
+    USB_DFU_RUNTIME_PROTOCOL, // DFU runtime protocol
+    0,                        // No string descriptor for this interface.
 };
 
 //*****************************************************************************
@@ -127,20 +124,17 @@ uint8_t g_pui8DFUInterface[DFUINTERFACE_SIZE] =
 // The DFU functional descriptor.
 //
 //*****************************************************************************
-uint8_t g_pui8DFUFunctionalDesc[DFUFUNCTIONALDESC_SIZE] =
-{
+uint8_t g_pui8DFUFunctionalDesc[DFUFUNCTIONALDESC_SIZE] = {
     //
     // Device Firmware Upgrade functional descriptor.
     //
-    9,                              // Length of this descriptor.
-    USB_DFU_FUNC_DESCRIPTOR_TYPE,   // DFU Functional descriptor type
-    (DFU_ATTR_CAN_DOWNLOAD |        // DFU attributes.
-     DFU_ATTR_CAN_UPLOAD |
-     DFU_ATTR_WILL_DETACH |
-     DFU_ATTR_MANIFEST_TOLERANT),
-    USBShort(0xFFFF),               // Detach timeout (set to maximum).
-    USBShort(DFU_TRANSFER_SIZE),    // Transfer size 1KB.
-    USBShort(0x0110)                // DFU Version 1.1
+    9,                            // Length of this descriptor.
+    USB_DFU_FUNC_DESCRIPTOR_TYPE, // DFU Functional descriptor type
+    (DFU_ATTR_CAN_DOWNLOAD |      // DFU attributes.
+     DFU_ATTR_CAN_UPLOAD | DFU_ATTR_WILL_DETACH | DFU_ATTR_MANIFEST_TOLERANT),
+    USBShort(0xFFFF),            // Detach timeout (set to maximum).
+    USBShort(DFU_TRANSFER_SIZE), // Transfer size 1KB.
+    USBShort(0x0110)             // DFU Version 1.1
 };
 
 //*****************************************************************************
@@ -152,23 +146,11 @@ uint8_t g_pui8DFUFunctionalDesc[DFUFUNCTIONALDESC_SIZE] =
 // 2.  The interface descriptor + DFU functional descriptor.
 //
 //*****************************************************************************
-const tConfigSection g_sDFUConfigSection =
-{
-    sizeof(g_pui8DFUConfigDescriptor),
-    g_pui8DFUConfigDescriptor
-};
+const tConfigSection g_sDFUConfigSection = {sizeof(g_pui8DFUConfigDescriptor), g_pui8DFUConfigDescriptor};
 
-const tConfigSection g_sDFUInterfaceSection =
-{
-    sizeof(g_pui8DFUInterface),
-    g_pui8DFUInterface
-};
+const tConfigSection g_sDFUInterfaceSection = {sizeof(g_pui8DFUInterface), g_pui8DFUInterface};
 
-const tConfigSection g_sDFUFunctionalDescSection =
-{
-    sizeof(g_pui8DFUFunctionalDesc),
-    g_pui8DFUFunctionalDesc
-};
+const tConfigSection g_sDFUFunctionalDescSection = {sizeof(g_pui8DFUFunctionalDesc), g_pui8DFUFunctionalDesc};
 
 //*****************************************************************************
 //
@@ -176,15 +158,9 @@ const tConfigSection g_sDFUFunctionalDescSection =
 // single, complete DFU runtime configuration descriptor.
 //
 //*****************************************************************************
-const tConfigSection *g_psDFUSections[] =
-{
-    &g_sDFUConfigSection,
-    &g_sDFUInterfaceSection,
-    &g_sDFUFunctionalDescSection
-};
+const tConfigSection *g_psDFUSections[] = {&g_sDFUConfigSection, &g_sDFUInterfaceSection, &g_sDFUFunctionalDescSection};
 
-#define NUM_DFU_SECTIONS        (sizeof(g_psDFUSections) /                    \
-                                 sizeof(g_psDFUSections[0]))
+#define NUM_DFU_SECTIONS (sizeof(g_psDFUSections) / sizeof(g_psDFUSections[0]))
 
 //*****************************************************************************
 //
@@ -193,21 +169,14 @@ const tConfigSection *g_psDFUSections[] =
 // together to generate the configuration descriptor.
 //
 //*****************************************************************************
-tConfigHeader g_sDFUConfigHeader =
-{
-    NUM_DFU_SECTIONS,
-    g_psDFUSections
-};
+tConfigHeader g_sDFUConfigHeader = {NUM_DFU_SECTIONS, g_psDFUSections};
 
 //*****************************************************************************
 //
 // Configuration Descriptor.
 //
 //*****************************************************************************
-const tConfigHeader * const g_ppsDFUConfigDescriptors[] =
-{
-    &g_sDFUConfigHeader
-};
+const tConfigHeader *const g_ppsDFUConfigDescriptors[] = {&g_sDFUConfigHeader};
 
 //*****************************************************************************
 //
@@ -216,16 +185,14 @@ const tConfigHeader * const g_ppsDFUConfigDescriptors[] =
 //*****************************************************************************
 static void HandleGetDescriptor(void *pvDFUInstance, tUSBRequest *psUSBRequest);
 static void HandleRequest(void *pvDFUInstance, tUSBRequest *psUSBRequest);
-static void HandleDevice(void *pvDFUInstance, uint32_t ui32Request,
-                         void *pvRequestData);
+static void HandleDevice(void *pvDFUInstance, uint32_t ui32Request, void *pvRequestData);
 
 //*****************************************************************************
 //
 // The device information structure for the USB DFU devices.
 //
 //*****************************************************************************
-static const tCustomHandlers g_sDFUHandlers =
-{
+static const tCustomHandlers g_sDFUHandlers = {
     //
     // GetDescriptor
     //
@@ -298,9 +265,7 @@ static const tCustomHandlers g_sDFUHandlers =
 // need which may be renumbered is the DFU runtime interface.
 //
 //*****************************************************************************
-static void
-HandleDevice(void *pvDFUInstance, uint32_t ui32Request, void *pvRequestData)
-{
+static void HandleDevice(void *pvDFUInstance, uint32_t ui32Request, void *pvRequestData) {
     tDFUInstance *psInst;
     uint8_t *pui8Data;
 
@@ -317,13 +282,11 @@ HandleDevice(void *pvDFUInstance, uint32_t ui32Request, void *pvRequestData)
     //
     // Which request event have we been passed?
     //
-    switch(ui32Request)
-    {
+    switch (ui32Request) {
         //
         // This was an interface change event.
         //
-        case USB_EVENT_COMP_IFACE_CHANGE:
-        {
+        case USB_EVENT_COMP_IFACE_CHANGE: {
             //
             // Save the change to the interface number.
             //
@@ -334,8 +297,7 @@ HandleDevice(void *pvDFUInstance, uint32_t ui32Request, void *pvRequestData)
         //
         // We are not interested in any other event.
         //
-        default:
-        {
+        default: {
             break;
         }
     }
@@ -355,9 +317,7 @@ HandleDevice(void *pvDFUInstance, uint32_t ui32Request, void *pvRequestData)
 // found, the endpoint is stalled to indicate an error to the host.
 //
 //*****************************************************************************
-static void
-HandleGetDescriptor(void *pvDFUInstance, tUSBRequest *psUSBRequest)
-{
+static void HandleGetDescriptor(void *pvDFUInstance, tUSBRequest *psUSBRequest) {
     uint32_t ui32Size;
 
     ASSERT(pvDFUInstance != 0);
@@ -366,19 +326,14 @@ HandleGetDescriptor(void *pvDFUInstance, tUSBRequest *psUSBRequest)
     // Which type of class descriptor are we being asked for?  We only support
     // 1 type - the DFU functional descriptor.
     //
-    if(((psUSBRequest->wValue >> 8) == USB_DFU_FUNC_DESCRIPTOR_TYPE) &&
-       ((psUSBRequest->wValue & 0xFF) == 0))
-    {
+    if (((psUSBRequest->wValue >> 8) == USB_DFU_FUNC_DESCRIPTOR_TYPE) && ((psUSBRequest->wValue & 0xFF) == 0)) {
         //
         // If there is more data to send than the host requested then just
         // send the requested amount of data.
         //
-        if((uint16_t)g_pui8DFUFunctionalDesc[0] > psUSBRequest->wLength)
-        {
+        if ((uint16_t)g_pui8DFUFunctionalDesc[0] > psUSBRequest->wLength) {
             ui32Size = (uint32_t)psUSBRequest->wLength;
-        }
-        else
-        {
+        } else {
             ui32Size = (uint32_t)g_pui8DFUFunctionalDesc[0];
         }
 
@@ -386,9 +341,7 @@ HandleGetDescriptor(void *pvDFUInstance, tUSBRequest *psUSBRequest)
         // Send the data via endpoint 0.
         //
         USBDCDSendDataEP0(0, g_pui8DFUFunctionalDesc, ui32Size);
-    }
-    else
-    {
+    } else {
         //
         // This was an unknown or invalid request so stall.
         //
@@ -410,9 +363,7 @@ HandleGetDescriptor(void *pvDFUInstance, tUSBRequest *psUSBRequest)
 // indicate an error to the host.
 //
 //*****************************************************************************
-static void
-HandleRequest(void *pvDFUInstance, tUSBRequest *psUSBRequest)
-{
+static void HandleRequest(void *pvDFUInstance, tUSBRequest *psUSBRequest) {
     tDFUInstance *psInst;
     tUSBDDFUDevice *psDevice;
 
@@ -421,7 +372,7 @@ HandleRequest(void *pvDFUInstance, tUSBRequest *psUSBRequest)
     //
     // Get a pointer to the DFU device structure
     //
-    psDevice = pvDFUInstance;
+    psDevice = (tUSBDDFUDevice *)pvDFUInstance;
 
     //
     // Get a pointer to the DFU device instance data pointer
@@ -431,16 +382,14 @@ HandleRequest(void *pvDFUInstance, tUSBRequest *psUSBRequest)
     //
     // Make sure the request was for this interface.
     //
-    if(psUSBRequest->wIndex != psInst->ui8Interface)
-    {
+    if (psUSBRequest->wIndex != psInst->ui8Interface) {
         return;
     }
 
     //
     // Determine the type of request.
     //
-    switch(psUSBRequest->bRequest)
-    {
+    switch (psUSBRequest->bRequest) {
         //
         // We have been asked to detach.  In this case, we call back to the
         // application telling it to tidy up and re-enter the boot loader.  We
@@ -448,21 +397,18 @@ HandleRequest(void *pvDFUInstance, tUSBRequest *psUSBRequest)
         // non-interrupt context and this call is most likely in interrupt
         // context.
         //
-        case USBD_DFU_REQUEST_DETACH:
-        {
+        case USBD_DFU_REQUEST_DETACH: {
             //
             // Tell the application it's time to reenter the boot loader.
             //
-            psDevice->pfnCallback(psDevice->pvCBData, USBD_DFU_EVENT_DETACH,
-                                  0, (void *)0);
+            psDevice->pfnCallback(psDevice->pvCBData, USBD_DFU_EVENT_DETACH, 0, (void *)0);
             break;
         }
 
         //
         // This request was not recognized so stall.
         //
-        default:
-        {
+        default: {
             USBDCDStallEP0(0);
             break;
         }
@@ -488,10 +434,7 @@ HandleRequest(void *pvDFUInstance, tUSBRequest *psUSBRequest)
 //! used with the remaining USB DFU APIs.
 //
 //*****************************************************************************
-void *
-USBDDFUCompositeInit(uint32_t ui32Index, tUSBDDFUDevice *psDFUDevice,
-                     tCompositeEntry *psCompEntry)
-{
+void *USBDDFUCompositeInit(uint32_t ui32Index, tUSBDDFUDevice *psDFUDevice, tCompositeEntry *psCompEntry) {
     tDFUInstance *psInst;
 
     //
@@ -510,23 +453,22 @@ USBDDFUCompositeInit(uint32_t ui32Index, tUSBDDFUDevice *psDFUDevice,
     // Initialize the composite entry that is used by the composite device
     // class.
     //
-    if(psCompEntry != 0)
-    {
-        psCompEntry->psDevInfo = &psInst->sDevInfo;
+    if (psCompEntry != 0) {
+        psCompEntry->psDevInfo  = &psInst->sDevInfo;
         psCompEntry->pvInstance = (void *)psDFUDevice;
     }
 
     //
     // Initialize the device information structure.
     //
-    psInst->sDevInfo.psCallbacks = &g_sDFUHandlers;
-    psInst->sDevInfo.pui8DeviceDescriptor = g_pui8DFUDeviceDescriptor;
-    psInst->sDevInfo.ppsConfigDescriptors = g_ppsDFUConfigDescriptors;
-    psInst->sDevInfo.ppui8StringDescriptors = 0;
+    psInst->sDevInfo.psCallbacks              = &g_sDFUHandlers;
+    psInst->sDevInfo.pui8DeviceDescriptor     = g_pui8DFUDeviceDescriptor;
+    psInst->sDevInfo.ppsConfigDescriptors     = g_ppsDFUConfigDescriptors;
+    psInst->sDevInfo.ppui8StringDescriptors   = 0;
     psInst->sDevInfo.ui32NumStringDescriptors = 0;
 
-    psInst->ui32USBBase = USB0_BASE;
-    psInst->bConnected = false;
+    psInst->ui32USBBase  = USB0_BASE;
+    psInst->bConnected   = false;
     psInst->ui8Interface = 0;
 
     //
@@ -537,7 +479,7 @@ USBDDFUCompositeInit(uint32_t ui32Index, tUSBDDFUDevice *psDFUDevice,
     //
     // Return the pointer to the instance indicating that everything went well.
     //
-    return((void *)psDFUDevice);
+    return ((void *)psDFUDevice);
 }
 
 //*****************************************************************************
@@ -556,9 +498,7 @@ USBDDFUCompositeInit(uint32_t ui32Index, tUSBDDFUDevice *psDFUDevice,
 //! \return None.
 //
 //*****************************************************************************
-void
-USBDDFUCompositeTerm(void *pvDFUInstance)
-{
+void USBDDFUCompositeTerm(void *pvDFUInstance) {
     tDFUInstance *psInst;
 
     ASSERT(pvDFUInstance);
@@ -594,9 +534,7 @@ USBDDFUCompositeTerm(void *pvDFUInstance)
 //! \return This function does not return.
 //
 //*****************************************************************************
-void
-USBDDFUUpdateBegin(void)
-{
+void USBDDFUUpdateBegin(void) {
     //
     // Terminate the USB device and take us off the bus.
     //
@@ -648,8 +586,7 @@ USBDDFUUpdateBegin(void)
     //
     // Should never get here, but just in case.
     //
-    while(1)
-    {
+    while (1) {
     }
 }
 

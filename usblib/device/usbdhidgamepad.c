@@ -4,20 +4,20 @@
 //
 // Copyright (c) 2013-2020 Texas Instruments Incorporated.  All rights reserved.
 // Software License Agreement
-// 
+//
 // Texas Instruments (TI) is supplying this software for use solely and
 // exclusively on TI's microcontroller products. The software is owned by
 // TI and/or its suppliers, and is protected under applicable copyright
 // laws. You may not combine this software with "viral" open-source
 // software in order to form a larger program.
-// 
+//
 // THIS SOFTWARE IS PROVIDED "AS IS" AND WITH ALL FAULTS.
 // NO WARRANTIES, WHETHER EXPRESS, IMPLIED OR STATUTORY, INCLUDING, BUT
 // NOT LIMITED TO, IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
 // A PARTICULAR PURPOSE APPLY TO THIS SOFTWARE. TI SHALL NOT, UNDER ANY
 // CIRCUMSTANCES, BE LIABLE FOR SPECIAL, INCIDENTAL, OR CONSEQUENTIAL
 // DAMAGES, FOR ANY REASON WHATSOEVER.
-// 
+//
 // This is part of revision 2.2.0.295 of the Tiva USB Library.
 //
 //*****************************************************************************
@@ -52,21 +52,20 @@
 // no such restriction on the bConfigurationValue values.
 //
 //*****************************************************************************
-static uint8_t g_pui8GameDescriptor[] =
-{
+static uint8_t g_pui8GameDescriptor[] = {
     //
     // Configuration descriptor header.
     //
-    9,                          // Size of the configuration descriptor.
-    USB_DTYPE_CONFIGURATION,    // Type of this descriptor.
-    USBShort(24),               // The total size of this full structure.
-    1,                          // The number of interfaces in this
-                                // configuration.
-    1,                          // The unique value for this configuration.
-    5,                          // The string identifier that describes this
-                                // configuration.
-    USB_CONF_ATTR_SELF_PWR,     // Self Powered.
-    0,                          // The maximum power in 2mA increments.
+    9,                       // Size of the configuration descriptor.
+    USB_DTYPE_CONFIGURATION, // Type of this descriptor.
+    USBShort(24),            // The total size of this full structure.
+    1,                       // The number of interfaces in this
+                             // configuration.
+    1,                       // The unique value for this configuration.
+    5,                       // The string identifier that describes this
+                             // configuration.
+    USB_CONF_ATTR_SELF_PWR,  // Self Powered.
+    0,                       // The maximum power in 2mA increments.
 };
 
 //*****************************************************************************
@@ -74,22 +73,21 @@ static uint8_t g_pui8GameDescriptor[] =
 // This is the HID interface descriptor for the gamepad device.
 //
 //*****************************************************************************
-static uint8_t g_pui8HIDInterface[HIDINTERFACE_SIZE] =
-{
+static uint8_t g_pui8HIDInterface[HIDINTERFACE_SIZE] = {
     //
     // HID Device Class Interface Descriptor.
     //
-    9,                          // Size of the interface descriptor.
-    USB_DTYPE_INTERFACE,        // Type of this descriptor.
-    0,                          // The index for this interface.
-    0,                          // The alternate setting for this interface.
-    1,                          // The number of endpoints used by this
-                                // interface.
-    USB_CLASS_HID,              // The interface class
-    0,                          // The interface sub-class.
-    0,                          // The interface protocol for the sub-class
-                                // specified above.
-    4,                          // The string index for this interface.
+    9,                   // Size of the interface descriptor.
+    USB_DTYPE_INTERFACE, // Type of this descriptor.
+    0,                   // The index for this interface.
+    0,                   // The alternate setting for this interface.
+    1,                   // The number of endpoints used by this
+                         // interface.
+    USB_CLASS_HID,       // The interface class
+    0,                   // The interface sub-class.
+    0,                   // The interface protocol for the sub-class
+                         // specified above.
+    4,                   // The string index for this interface.
 };
 
 //*****************************************************************************
@@ -97,18 +95,17 @@ static uint8_t g_pui8HIDInterface[HIDINTERFACE_SIZE] =
 // This is the HID IN endpoint descriptor for the gamepad device.
 //
 //*****************************************************************************
-static const uint8_t g_pui8HIDInEndpoint[HIDINENDPOINT_SIZE] =
-{
+static const uint8_t g_pui8HIDInEndpoint[HIDINENDPOINT_SIZE] = {
     //
     // Interrupt IN endpoint descriptor
     //
-    7,                          // The size of the endpoint descriptor.
-    USB_DTYPE_ENDPOINT,         // Descriptor type is an endpoint.
+    7,                  // The size of the endpoint descriptor.
+    USB_DTYPE_ENDPOINT, // Descriptor type is an endpoint.
     USB_EP_DESC_IN | USBEPToIndex(USB_EP_1),
-    USB_EP_ATTR_INT,            // Endpoint is an interrupt endpoint.
+    USB_EP_ATTR_INT, // Endpoint is an interrupt endpoint.
     USBShort(USBFIFOSizeToBytes(USB_FIFO_SZ_64)),
-                                // The maximum packet size.
-    1,                          // The polling interval for this endpoint.
+    // The maximum packet size.
+    1, // The polling interval for this endpoint.
 };
 
 //*****************************************************************************
@@ -117,77 +114,67 @@ static const uint8_t g_pui8HIDInEndpoint[HIDINENDPOINT_SIZE] =
 // to the host.
 //
 //*****************************************************************************
-static const uint8_t g_pui8GameReportDescriptor[] =
-{
-    UsagePage(USB_HID_GENERIC_DESKTOP),
-    Usage(USB_HID_JOYSTICK),
-    Collection(USB_HID_APPLICATION),
-        //
-        // The axis for the controller.
-        //
-        UsagePage(USB_HID_GENERIC_DESKTOP),
-        Usage (USB_HID_POINTER),
-        Collection (USB_HID_PHYSICAL),
+static const uint8_t g_pui8GameReportDescriptor[] = {UsagePage(USB_HID_GENERIC_DESKTOP),
+                                                     Usage(USB_HID_JOYSTICK),
+                                                     Collection(USB_HID_APPLICATION),
+                                                     //
+                                                     // The axis for the controller.
+                                                     //
+                                                     UsagePage(USB_HID_GENERIC_DESKTOP),
+                                                     Usage(USB_HID_POINTER),
+                                                     Collection(USB_HID_PHYSICAL),
 
-            //
-            // The X, Y and Z values which are specified as 8-bit absolute
-            // position values.
-            //
-            Usage (USB_HID_X),
-            Usage (USB_HID_Y),
-            Usage (USB_HID_Z),
+                                                     //
+                                                     // The X, Y and Z values which are specified as 8-bit absolute
+                                                     // position values.
+                                                     //
+                                                     Usage(USB_HID_X),
+                                                     Usage(USB_HID_Y),
+                                                     Usage(USB_HID_Z),
 
-            //
-            // 3 8-bit absolute values.
-            //
-            ReportSize(8),
-            ReportCount(3),
-            Input(USB_HID_INPUT_DATA | USB_HID_INPUT_VARIABLE |
-                  USB_HID_INPUT_ABS),
+                                                     //
+                                                     // 3 8-bit absolute values.
+                                                     //
+                                                     ReportSize(8),
+                                                     ReportCount(3),
+                                                     Input(USB_HID_INPUT_DATA | USB_HID_INPUT_VARIABLE | USB_HID_INPUT_ABS),
 
-            //
-            // The 8 buttons.
-            //
-            UsagePage(USB_HID_BUTTONS),
-            UsageMinimum(1),
-            UsageMaximum(8),
-            LogicalMinimum(0),
-            LogicalMaximum(1),
-            PhysicalMinimum(0),
-            PhysicalMaximum(1),
+                                                     //
+                                                     // The 8 buttons.
+                                                     //
+                                                     UsagePage(USB_HID_BUTTONS),
+                                                     UsageMinimum(1),
+                                                     UsageMaximum(8),
+                                                     LogicalMinimum(0),
+                                                     LogicalMaximum(1),
+                                                     PhysicalMinimum(0),
+                                                     PhysicalMaximum(1),
 
-            //
-            // 8 - 1 bit values for the buttons.
-            //
-            ReportSize(1),
-            ReportCount(8),
-            Input(USB_HID_INPUT_DATA | USB_HID_INPUT_VARIABLE |
-                  USB_HID_INPUT_ABS),
+                                                     //
+                                                     // 8 - 1 bit values for the buttons.
+                                                     //
+                                                     ReportSize(1),
+                                                     ReportCount(8),
+                                                     Input(USB_HID_INPUT_DATA | USB_HID_INPUT_VARIABLE | USB_HID_INPUT_ABS),
 
-        EndCollection,
-    EndCollection
-};
+                                                     EndCollection,
+                                                     EndCollection};
 
 //*****************************************************************************
 //
 // The HID descriptor for the gamepad device.
 //
 //*****************************************************************************
-static tHIDDescriptor g_sGameHIDDescriptor =
-{
-    9,                              // bLength
-    USB_HID_DTYPE_HID,              // bDescriptorType
-    0x111,                          // bcdHID (version 1.11 compliant)
-    0,                              // bCountryCode (not localized)
-    1,                              // bNumDescriptors
-    {
-        {
-            USB_HID_DTYPE_REPORT,   // Report descriptor
-            sizeof(g_pui8GameReportDescriptor)
-                                    // Size of report descriptor
-        }
-    }
-};
+static tHIDDescriptor g_sGameHIDDescriptor = {9,                 // bLength
+                                              USB_HID_DTYPE_HID, // bDescriptorType
+                                              0x111,             // bcdHID (version 1.11 compliant)
+                                              0,                 // bCountryCode (not localized)
+                                              1,                 // bNumDescriptors
+                                              {{
+                                                  USB_HID_DTYPE_REPORT, // Report descriptor
+                                                  sizeof(g_pui8GameReportDescriptor)
+                                                  // Size of report descriptor
+                                              }}};
 
 //*****************************************************************************
 //
@@ -201,34 +188,18 @@ static tHIDDescriptor g_sGameHIDDescriptor =
 // 4.  The mandatory interrupt IN endpoint descriptor.
 //
 //*****************************************************************************
-static const tConfigSection g_sHIDConfigSection =
-{
-    sizeof(g_pui8GameDescriptor),
-    g_pui8GameDescriptor
-};
+static const tConfigSection g_sHIDConfigSection = {sizeof(g_pui8GameDescriptor), g_pui8GameDescriptor};
 
-static const tConfigSection g_sHIDInterfaceSection =
-{
-    sizeof(g_pui8HIDInterface),
-    g_pui8HIDInterface
-};
+static const tConfigSection g_sHIDInterfaceSection = {sizeof(g_pui8HIDInterface), g_pui8HIDInterface};
 
-static const tConfigSection g_sHIDInEndpointSection =
-{
-    sizeof(g_pui8HIDInEndpoint),
-    g_pui8HIDInEndpoint
-};
+static const tConfigSection g_sHIDInEndpointSection = {sizeof(g_pui8HIDInEndpoint), g_pui8HIDInEndpoint};
 
 //*****************************************************************************
 //
 // Place holder for the user's HID descriptor block.
 //
 //*****************************************************************************
-static tConfigSection g_sHIDDescriptorSection =
-{
-   sizeof(g_sGameHIDDescriptor),
-   (const uint8_t *)&g_sGameHIDDescriptor
-};
+static tConfigSection g_sHIDDescriptorSection = {sizeof(g_sGameHIDDescriptor), (const uint8_t *)&g_sGameHIDDescriptor};
 
 //*****************************************************************************
 //
@@ -236,16 +207,14 @@ static tConfigSection g_sHIDDescriptorSection =
 // single, complete HID configuration descriptor.
 //
 //*****************************************************************************
-static const tConfigSection *g_psHIDSections[] =
-{
+static const tConfigSection *g_psHIDSections[] = {
     &g_sHIDConfigSection,
     &g_sHIDInterfaceSection,
     &g_sHIDDescriptorSection,
     &g_sHIDInEndpointSection,
 };
 
-#define NUM_HID_SECTIONS        ((sizeof(g_psHIDSections) /                   \
-                                  sizeof(tConfigSection *)))
+#define NUM_HID_SECTIONS ((sizeof(g_psHIDSections) / sizeof(tConfigSection *)))
 
 //*****************************************************************************
 //
@@ -256,21 +225,14 @@ static const tConfigSection *g_psHIDSections[] =
 // client supplied initialization parameters.
 //
 //*****************************************************************************
-static tConfigHeader g_sHIDConfigHeader =
-{
-    NUM_HID_SECTIONS,
-    g_psHIDSections
-};
+static tConfigHeader g_sHIDConfigHeader = {NUM_HID_SECTIONS, g_psHIDSections};
 
 //*****************************************************************************
 //
 // Configuration Descriptor.
 //
 //*****************************************************************************
-static const tConfigHeader * const g_ppsHIDConfigDescriptors[] =
-{
-    &g_sHIDConfigHeader
-};
+static const tConfigHeader *const g_ppsHIDConfigDescriptors[] = {&g_sHIDConfigHeader};
 
 //*****************************************************************************
 //
@@ -278,10 +240,7 @@ static const tConfigHeader * const g_ppsHIDConfigDescriptors[] =
 // single report descriptor.
 //
 //*****************************************************************************
-static const uint8_t *g_ppui8GameClassDescriptors[] =
-{
-    g_pui8GameReportDescriptor
-};
+static const uint8_t *g_ppui8GameClassDescriptors[] = {g_pui8GameReportDescriptor};
 
 //*****************************************************************************
 //
@@ -301,10 +260,7 @@ static const uint8_t *g_ppui8GameClassDescriptors[] =
 // \return Returns a value which is event-specific.
 //
 //*****************************************************************************
-static uint32_t
-HIDGamepadTxHandler(void *pvGameDevice, uint32_t ui32Event,
-                    uint32_t ui32MsgData, void *pvMsgData)
-{
+static uint32_t HIDGamepadTxHandler(void *pvGameDevice, uint32_t ui32Event, uint32_t ui32MsgData, void *pvMsgData) {
     tUSBDGamepadInstance *psInst;
     tUSBDHIDGamepadDevice *psGamepad;
 
@@ -317,19 +273,17 @@ HIDGamepadTxHandler(void *pvGameDevice, uint32_t ui32Event,
     // Get a pointer to our instance data
     //
     psGamepad = (tUSBDHIDGamepadDevice *)pvGameDevice;
-    psInst = &psGamepad->sPrivateData;
+    psInst    = &psGamepad->sPrivateData;
 
     //
     // Which event were we sent?
     //
-    switch (ui32Event)
-    {
+    switch (ui32Event) {
         //
         // A report transmitted via the interrupt IN endpoint was acknowledged
         // by the host.
         //
-        case USB_EVENT_TX_COMPLETE:
-        {
+        case USB_EVENT_TX_COMPLETE: {
             //
             // The last transmission is complete so return to the idle state.
             //
@@ -338,8 +292,7 @@ HIDGamepadTxHandler(void *pvGameDevice, uint32_t ui32Event,
             //
             // Pass the event on to the application.
             //
-            psGamepad->pfnCallback(psGamepad->pvCBData, USB_EVENT_TX_COMPLETE,
-                                   ui32MsgData, (void *)0);
+            psGamepad->pfnCallback(psGamepad->pvCBData, USB_EVENT_TX_COMPLETE, ui32MsgData, (void *)0);
 
             break;
         }
@@ -348,13 +301,12 @@ HIDGamepadTxHandler(void *pvGameDevice, uint32_t ui32Event,
         // Ignore all other events related to transmission of reports via
         // the interrupt IN endpoint.
         //
-        default:
-        {
+        default: {
             break;
         }
     }
 
-    return(0);
+    return (0);
 }
 
 //*****************************************************************************
@@ -378,10 +330,7 @@ HIDGamepadTxHandler(void *pvGameDevice, uint32_t ui32Event,
 // \return Returns a value which is event-specific.
 //
 //*****************************************************************************
-static uint32_t
-HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
-                    void *pvMsgData)
-{
+static uint32_t HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData, void *pvMsgData) {
     tUSBDGamepadInstance *psInst;
     tUSBDHIDGamepadDevice *psGamepad;
     uint32_t ui32Ret;
@@ -400,18 +349,16 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
     // Get a pointer to our instance data
     //
     psGamepad = (tUSBDHIDGamepadDevice *)pvGamepad;
-    psInst = &psGamepad->sPrivateData;
+    psInst    = &psGamepad->sPrivateData;
 
     //
     // Which event were we sent?
     //
-    switch(ui32Event)
-    {
+    switch (ui32Event) {
         //
         // The host has connected to us and configured the device.
         //
-        case USB_EVENT_CONNECTED:
-        {
+        case USB_EVENT_CONNECTED: {
             //
             // Now in the idle state.
             //
@@ -420,8 +367,7 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
             //
             // Pass the information on to the application.
             //
-            psGamepad->pfnCallback(psGamepad->pvCBData, USB_EVENT_CONNECTED, 0,
-                                   (void *)0);
+            psGamepad->pfnCallback(psGamepad->pvCBData, USB_EVENT_CONNECTED, 0, (void *)0);
 
             break;
         }
@@ -429,16 +375,13 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
         //
         // The host has disconnected from us.
         //
-        case USB_EVENT_DISCONNECTED:
-        {
+        case USB_EVENT_DISCONNECTED: {
             psInst->iState = eHIDGamepadStateNotConnected;
 
             //
             // Pass the information on to the application.
             //
-            ui32Ret = psGamepad->pfnCallback(psGamepad->pvCBData,
-                                             USB_EVENT_DISCONNECTED, 0,
-                                             (void *)0);
+            ui32Ret = psGamepad->pfnCallback(psGamepad->pvCBData, USB_EVENT_DISCONNECTED, 0, (void *)0);
 
             break;
         }
@@ -446,8 +389,7 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
         //
         // This handles the Set Idle command.
         //
-        case USBD_HID_EVENT_IDLE_TIMEOUT:
-        {
+        case USBD_HID_EVENT_IDLE_TIMEOUT: {
             //
             // Give the pointer to the idle report structure.
             //
@@ -462,17 +404,13 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
         // The host is polling for a particular report and the HID driver
         // is asking for the latest version to transmit.
         //
-        case USBD_HID_EVENT_GET_REPORT:
-        {
+        case USBD_HID_EVENT_GET_REPORT: {
             //
             // If this is an IN request then pass the request on to the
             // application.  All other requests are ignored.
             //
-            if(ui32MsgData == USB_HID_REPORT_IN)
-            {
-                ui32Ret = psGamepad->pfnCallback(psGamepad->pvCBData,
-                                                 USBD_HID_EVENT_GET_REPORT, 0,
-                                                 pvMsgData);
+            if (ui32MsgData == USB_HID_REPORT_IN) {
+                ui32Ret = psGamepad->pfnCallback(psGamepad->pvCBData, USBD_HID_EVENT_GET_REPORT, 0, pvMsgData);
             }
 
             break;
@@ -482,8 +420,7 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
         // The device class driver has completed sending a report to the
         // host in response to a Get_Report request.
         //
-        case USBD_HID_EVENT_REPORT_SENT:
-        {
+        case USBD_HID_EVENT_REPORT_SENT: {
             //
             // We have nothing to do here.
             //
@@ -498,10 +435,8 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
         case USB_EVENT_RESUME:
         case USB_EVENT_LPM_RESUME:
         case USB_EVENT_LPM_SLEEP:
-        case USB_EVENT_LPM_ERROR:
-        {
-            ui32Ret = psGamepad->pfnCallback(psGamepad->pvCBData, ui32Event,
-                                             ui32MsgData, pvMsgData);
+        case USB_EVENT_LPM_ERROR: {
+            ui32Ret = psGamepad->pfnCallback(psGamepad->pvCBData, ui32Event, ui32MsgData, pvMsgData);
 
             break;
         }
@@ -515,12 +450,11 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
         //
         // We ignore all other events.
         //
-        default:
-        {
+        default: {
             break;
         }
     }
-    return(ui32Ret);
+    return (ui32Ret);
 }
 
 //*****************************************************************************
@@ -555,9 +489,7 @@ HIDGamepadRxHandler(void *pvGamepad, uint32_t ui32Event, uint32_t ui32MsgData,
 //! \return Returns NULL on failure or the \e psGamepad pointer on success.
 //
 //*****************************************************************************
-tUSBDHIDGamepadDevice *
-USBDHIDGamepadInit(uint32_t ui32Index, tUSBDHIDGamepadDevice *psGamepad)
-{
+tUSBDHIDGamepadDevice *USBDHIDGamepadInit(uint32_t ui32Index, tUSBDHIDGamepadDevice *psGamepad) {
     void *pvRetcode;
     tUSBDHIDDevice *psHIDDevice;
     tConfigDescriptor *pConfigDesc;
@@ -579,16 +511,15 @@ USBDHIDGamepadInit(uint32_t ui32Index, tUSBDHIDGamepadDevice *psGamepad)
     //
     pvRetcode = USBDHIDGamepadCompositeInit(ui32Index, psGamepad, 0);
 
-    pConfigDesc = (tConfigDescriptor *)g_pui8GameDescriptor;
+    pConfigDesc               = (tConfigDescriptor *)g_pui8GameDescriptor;
     pConfigDesc->bmAttributes = psGamepad->ui8PwrAttributes;
-    pConfigDesc->bMaxPower =  (uint8_t)(psGamepad->ui16MaxPowermA / 2);
+    pConfigDesc->bMaxPower    = (uint8_t)(psGamepad->ui16MaxPowermA / 2);
 
     //
     // If we initialized the HID layer successfully, pass our device pointer
     // back as the return code, otherwise return NULL to indicate an error.
     //
-    if(pvRetcode)
-    {
+    if (pvRetcode) {
         //
         // Initialize the lower layer HID driver and pass it the various
         // structures and descriptors necessary to declare that we are a
@@ -596,11 +527,9 @@ USBDHIDGamepadInit(uint32_t ui32Index, tUSBDHIDGamepadDevice *psGamepad)
         //
         pvRetcode = USBDHIDInit(ui32Index, psHIDDevice);
 
-        return(psGamepad);
-    }
-    else
-    {
-        return((tUSBDHIDGamepadDevice *)0);
+        return (psGamepad);
+    } else {
+        return ((tUSBDHIDGamepadDevice *)0);
     }
 }
 
@@ -627,11 +556,7 @@ USBDHIDGamepadInit(uint32_t ui32Index, tUSBDHIDGamepadDevice *psGamepad)
 //! used with the remaining USB HID gamepad APIs.
 //
 //*****************************************************************************
-tUSBDHIDGamepadDevice *
-USBDHIDGamepadCompositeInit(uint32_t ui32Index,
-                            tUSBDHIDGamepadDevice *psGamepad,
-                            tCompositeEntry *psCompEntry)
-{
+tUSBDHIDGamepadDevice *USBDHIDGamepadCompositeInit(uint32_t ui32Index, tUSBDHIDGamepadDevice *psGamepad, tCompositeEntry *psCompEntry) {
     tUSBDGamepadInstance *psInst;
     tUSBDHIDDevice *psHIDDevice;
 
@@ -661,35 +586,32 @@ USBDHIDGamepadCompositeInit(uint32_t ui32Index,
     // Initialize the HID device class instance structure based on input from
     // the caller.
     //
-    psHIDDevice->ui16PID = psGamepad->ui16PID;
-    psHIDDevice->ui16VID = psGamepad->ui16VID;
-    psHIDDevice->ui16MaxPowermA = psGamepad->ui16MaxPowermA;
-    psHIDDevice->ui8PwrAttributes = psGamepad->ui8PwrAttributes;
-    psHIDDevice->ui8Subclass = 0;
-    psHIDDevice->ui8Protocol = 0;
-    psHIDDevice->ui8NumInputReports = 1;
-    psHIDDevice->psReportIdle = &psInst->sReportIdle;
-    psInst->sReportIdle.ui8Duration4mS = 125;
-    psInst->sReportIdle.ui8ReportID = 0;
+    psHIDDevice->ui16PID                      = psGamepad->ui16PID;
+    psHIDDevice->ui16VID                      = psGamepad->ui16VID;
+    psHIDDevice->ui16MaxPowermA               = psGamepad->ui16MaxPowermA;
+    psHIDDevice->ui8PwrAttributes             = psGamepad->ui8PwrAttributes;
+    psHIDDevice->ui8Subclass                  = 0;
+    psHIDDevice->ui8Protocol                  = 0;
+    psHIDDevice->ui8NumInputReports           = 1;
+    psHIDDevice->psReportIdle                 = &psInst->sReportIdle;
+    psInst->sReportIdle.ui8Duration4mS        = 125;
+    psInst->sReportIdle.ui8ReportID           = 0;
     psInst->sReportIdle.ui32TimeSinceReportmS = 0;
-    psInst->sReportIdle.ui16TimeTillNextmS = 0;
-    psHIDDevice->pfnTxCallback = HIDGamepadTxHandler;
-    psHIDDevice->pvRxCBData = (void *)psGamepad;
-    psHIDDevice->pfnRxCallback = HIDGamepadRxHandler;
-    psHIDDevice->pvTxCBData = (void *)psGamepad;
-    psHIDDevice->bUseOutEndpoint = false,
-    psHIDDevice->psHIDDescriptor = &g_sGameHIDDescriptor;
-    psHIDDevice->ppui8ClassDescriptors = g_ppui8GameClassDescriptors;
-    psHIDDevice->ppui8StringDescriptors = psGamepad->ppui8StringDescriptors;
-    psHIDDevice->ui32NumStringDescriptors =
-                                          psGamepad->ui32NumStringDescriptors;
-    psHIDDevice->ppsConfigDescriptor = g_ppsHIDConfigDescriptors;
+    psInst->sReportIdle.ui16TimeTillNextmS    = 0;
+    psHIDDevice->pfnTxCallback                = HIDGamepadTxHandler;
+    psHIDDevice->pvRxCBData                   = (void *)psGamepad;
+    psHIDDevice->pfnRxCallback                = HIDGamepadRxHandler;
+    psHIDDevice->pvTxCBData                   = (void *)psGamepad;
+    psHIDDevice->bUseOutEndpoint = false, psHIDDevice->psHIDDescriptor = &g_sGameHIDDescriptor;
+    psHIDDevice->ppui8ClassDescriptors    = g_ppui8GameClassDescriptors;
+    psHIDDevice->ppui8StringDescriptors   = psGamepad->ppui8StringDescriptors;
+    psHIDDevice->ui32NumStringDescriptors = psGamepad->ui32NumStringDescriptors;
+    psHIDDevice->ppsConfigDescriptor      = g_ppsHIDConfigDescriptors;
 
     //
     // If there was an override for the report descriptor then use it.
     //
-    if(psGamepad->pui8ReportDescriptor)
-    {
+    if (psGamepad->pui8ReportDescriptor) {
         //
         // Save the report descriptor in the list of report descriptors.
         //
@@ -698,15 +620,14 @@ USBDHIDGamepadCompositeInit(uint32_t ui32Index,
         //
         // Override the report descriptor size.
         //
-        g_sGameHIDDescriptor.sClassDescriptor[0].wDescriptorLength =
-                                                    psGamepad->ui32ReportSize;
+        g_sGameHIDDescriptor.sClassDescriptor[0].wDescriptorLength = psGamepad->ui32ReportSize;
     }
 
     //
     // Initialize the lower layer HID driver and pass it the various structures
     // and descriptors necessary to declare that we are a gamepad.
     //
-    return(USBDHIDCompositeInit(ui32Index, psHIDDevice, psCompEntry));
+    return ((tUSBDHIDGamepadDevice *)USBDHIDCompositeInit(ui32Index, psHIDDevice, psCompEntry));
 }
 
 //*****************************************************************************
@@ -733,10 +654,7 @@ USBDHIDGamepadCompositeInit(uint32_t ui32Index,
 //! \return The function returns one of the \b USBDGAMEPAD_* values.
 //
 //*****************************************************************************
-uint32_t
-USBDHIDGamepadSendReport(tUSBDHIDGamepadDevice *psHIDGamepad, void *pvReport,
-                         uint32_t ui32Size)
-{
+uint32_t USBDHIDGamepadSendReport(tUSBDHIDGamepadDevice *psHIDGamepad, void *pvReport, uint32_t ui32Size) {
     uint32_t ui32Retcode, ui32Count;
     tUSBDGamepadInstance *psInst;
     tUSBDHIDDevice *psHIDDevice;
@@ -755,47 +673,39 @@ USBDHIDGamepadSendReport(tUSBDHIDGamepadDevice *psHIDGamepad, void *pvReport,
     // If we are not configured, return an error here before trying to send
     // anything.
     //
-    if(psInst->iState == eHIDGamepadStateNotConnected)
-    {
-        return(USBDGAMEPAD_NOT_CONFIGURED);
+    if (psInst->iState == eHIDGamepadStateNotConnected) {
+        return (USBDGAMEPAD_NOT_CONFIGURED);
     }
 
     //
     // Only send a report if the transmitter is currently free.
     //
-    if(USBDHIDTxPacketAvailable((void *)psHIDDevice))
-    {
+    if (USBDHIDTxPacketAvailable((void *)psHIDDevice)) {
         //
         // Send the report to the host.
         //
         psInst->iState = eHIDGamepadStateSending;
-        ui32Count = USBDHIDReportWrite((void *)psHIDDevice, pvReport, ui32Size,
-                                       true);
+        ui32Count      = USBDHIDReportWrite((void *)psHIDDevice, (uint8_t *)pvReport, ui32Size, true);
 
         //
         // Did we schedule a packet for transmission correctly?
         //
-        if(ui32Count == 0)
-        {
+        if (ui32Count == 0) {
             //
             // No - report the error to the caller.
             //
             ui32Retcode = USBDGAMEPAD_TX_ERROR;
-        }
-        else
-        {
+        } else {
             ui32Retcode = USBDGAMEPAD_SUCCESS;
         }
-    }
-    else
-    {
+    } else {
         ui32Retcode = USBDGAMEPAD_TX_ERROR;
     }
 
     //
     // Return the relevant error code to the caller.
     //
-    return(ui32Retcode);
+    return (ui32Retcode);
 }
 
 //*****************************************************************************
@@ -814,9 +724,7 @@ USBDHIDGamepadSendReport(tUSBDHIDGamepadDevice *psHIDGamepad, void *pvReport,
 //! \return None.
 //
 //*****************************************************************************
-void
-USBDHIDGamepadTerm(tUSBDHIDGamepadDevice *psGamepad)
-{
+void USBDHIDGamepadTerm(tUSBDHIDGamepadDevice *psGamepad) {
     tUSBDHIDDevice *psHIDDevice;
 
     ASSERT(psGamepad);
