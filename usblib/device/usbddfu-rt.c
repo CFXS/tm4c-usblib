@@ -581,7 +581,11 @@ void USBDDFUUpdateBegin(void) {
     // Return control to the boot loader.  This is a call to the SVC
     // handler in the boot loader.
     //
+
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Warray-bounds"
     (*((void (*)(void))(*(uint32_t *)0x2c)))();
+#pragma GCC diagnostic pop
 
     //
     // Should never get here, but just in case.
