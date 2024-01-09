@@ -3,12 +3,12 @@ tm4c_usblib = create_library("TM4C usblib")
 tm4c_usblib:add_include_paths("public", {"./"})
 tm4c_usblib:add_sources("./src/**.c")
 
-if _G.TOOLCHAIN == "GCC" or _G.TOOLCHAIN == "Clang" then
+if _G.CFXS_TOOLCHAIN == "GCC" or _G.CFXS_TOOLCHAIN == "Clang" then
     tm4c_usblib:add_compile_options("private", {
         "-fpermissive",
         "-Wno-missing-field-initializers",
         "-Wno-unused-but-set-variable",
     })
 else
-    error("Not implemented")
+    error("Toolchain [".._G.CFXS_TOOLCHAIN.."] not implemented")
 end
