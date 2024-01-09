@@ -337,7 +337,7 @@ typedef struct
     //
     // The state of a given USB pipe.
     //
-    volatile PipeState_t iState;
+    volatile enum PipeState_t iState;
 
     //
     // The actual FIFO offset allocated to this endpoint.

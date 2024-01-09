@@ -5,7 +5,6 @@ tm4c_usblib:add_sources("./**.c")
 
 if _G.CFXS_TOOLCHAIN == "GCC" or _G.CFXS_TOOLCHAIN == "Clang" then
     tm4c_usblib:add_compile_options("private", {
-        "-fpermissive",
         "-Wno-missing-field-initializers",
         "-Wno-unused-but-set-variable",
     })
