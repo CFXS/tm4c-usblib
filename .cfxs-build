@@ -33,9 +33,9 @@ if _G.CONFIG_TM4C_USBLIB.type == "host" then
     tm4c_usblib:add_sources("./usblib/host/*.c")
 elseif _G.CONFIG_TM4C_USBLIB.type == "device" then
     tm4c_usblib:add_sources("./usblib/device/*.c")
-elseif _G.CONFIG_TM4C_USBLIB.type == "host/device" then
+elseif _G.CONFIG_TM4C_USBLIB.type == "host/device" or _G.CONFIG_TM4C_USBLIB.type == "device/host" then
     tm4c_usblib:add_sources("./usblib/host/*.c")
     tm4c_usblib:add_sources("./usblib/device/*.c")
 else
-    assert(0, "Invalid _G.CONFIG_TM4C_USBLIB.type: ".._G.CONFIG_TM4C_USBLIB.type)
+    assert(false, "Invalid _G.CONFIG_TM4C_USBLIB.type: "..tostring(_G.CONFIG_TM4C_USBLIB.type))
 end
