@@ -1,4 +1,7 @@
 printf("Load TM4C usblib")
+local config = ...
+assert(_G.CFXS_TOOLCHAIN ~= nil, "_G.CFXS_TOOLCHAIN not specified")
+
 tm4c_usblib = create_library("tm4c-usblib")
 tm4c_usblib:add_include_paths("public", {"./"})
 
@@ -20,22 +23,22 @@ assert(tm4c_driverlib ~= nil, "tm4c_driverlib not imported")
 tm4c_usblib:add_libraries(tm4c_driverlib)
 
 local CONFIG_TEMPLATE = [[
-_G.CONFIG_TM4C_USBLIB = {
+{
     type = "host" | "device" | "host/device"
 }
 ]]
-assert(_G.CONFIG_TM4C_USBLIB ~= nil, "_G.CONFIG_TM4C_USBLIB not defined\n"..CONFIG_TEMPLATE)
+assert(config ~= nil, "Import arguments not defined\n"..CONFIG_TEMPLATE)
 
 -- Base sources
 tm4c_usblib:add_sources("./usblib/*.c")
 
-if _G.CONFIG_TM4C_USBLIB.type == "host" then
+if config.type == "host" then
     tm4c_usblib:add_sources("./usblib/host/*.c")
-elseif _G.CONFIG_TM4C_USBLIB.type == "device" then
+elseif config.type == "device" then
     tm4c_usblib:add_sources("./usblib/device/*.c")
-elseif _G.CONFIG_TM4C_USBLIB.type == "host/device" or _G.CONFIG_TM4C_USBLIB.type == "device/host" then
+elseif config.type == "host/device" or config.type == "device/host" then
     tm4c_usblib:add_sources("./usblib/host/*.c")
     tm4c_usblib:add_sources("./usblib/device/*.c")
 else
-    assert(false, "Invalid _G.CONFIG_TM4C_USBLIB.type: "..tostring(_G.CONFIG_TM4C_USBLIB.type))
+    assert(false, "Invalid config.type: "..tostring(config.type))
 end
