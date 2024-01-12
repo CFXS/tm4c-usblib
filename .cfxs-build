@@ -33,12 +33,15 @@ assert(config ~= nil, "Import arguments not defined\n"..CONFIG_TEMPLATE)
 tm4c_usblib:add_sources("./usblib/*.c")
 
 if config.type == "host" then
+    printf(" - Host mode")
     tm4c_usblib:add_sources("./usblib/host/*.c")
 elseif config.type == "device" then
+    printf(" - Device mode")
     tm4c_usblib:add_sources("./usblib/device/*.c")
 elseif config.type == "host/device" or config.type == "device/host" then
+    printf(" - Host/Device mode")
     tm4c_usblib:add_sources("./usblib/host/*.c")
     tm4c_usblib:add_sources("./usblib/device/*.c")
 else
-    assert(false, "Invalid config.type: "..tostring(config.type))
+    error("Invalid config.type: "..tostring(config.type))
 end
