@@ -21,7 +21,7 @@ tm4c_usblib:add_libraries(tm4c_driverlib)
 
 local CONFIG_TEMPLATE = [[
 _G.CONFIG_TM4C_USBLIB = {
-    type = "host" / "device" / "both"
+    type = "host" | "device" | "host/device"
 }
 ]]
 assert(_G.CONFIG_TM4C_USBLIB ~= nil, "_G.CONFIG_TM4C_USBLIB not defined\n"..CONFIG_TEMPLATE)
@@ -32,7 +32,7 @@ if _G.CONFIG_TM4C_USBLIB.type == "host" then
     tm4c_usblib:add_sources("./usblib/host/*.c")
 elseif _G.CONFIG_TM4C_USBLIB.type == "device" then
     tm4c_usblib:add_sources("./usblib/device/*.c")
-elseif _G.CONFIG_TM4C_USBLIB.type == "both" then
+elseif _G.CONFIG_TM4C_USBLIB.type == "host/device" then
     tm4c_usblib:add_sources("./usblib/host/*.c")
     tm4c_usblib:add_sources("./usblib/device/*.c")
 else
