@@ -26,7 +26,8 @@ _G.CONFIG_TM4C_USBLIB = {
 ]]
 assert(_G.CONFIG_TM4C_USBLIB ~= nil, "_G.CONFIG_TM4C_USBLIB not defined\n"..CONFIG_TEMPLATE)
 
-tm4c_usblib:add_sources("./*.c")
+-- Base sources
+tm4c_usblib:add_sources("./usblib/*.c")
 
 if _G.CONFIG_TM4C_USBLIB.type == "host" then
     tm4c_usblib:add_sources("./usblib/host/*.c")
