@@ -3,7 +3,7 @@ tm4c_usblib = create_library("tm4c-usblib")
 tm4c_usblib:add_include_paths("public", {"./"})
 tm4c_usblib:add_sources("./**.c")
 
-tm4c_usblib:create_precompiled_header("private", {
+tm4c_usblib:create_precompiled_header({
     "<stdint.h>",
     "<stddef.h>",
 })
