@@ -1,7 +1,6 @@
 printf("Load TM4C usblib")
 tm4c_usblib = create_library("tm4c-usblib")
 tm4c_usblib:add_include_paths("public", {"./"})
-tm4c_usblib:add_sources("./**.c")
 
 tm4c_usblib:create_precompiled_header({
     "<stdint.h>",
@@ -19,3 +18,23 @@ end
 
 assert(tm4c_driverlib ~= nil, "tm4c_driverlib not imported")
 tm4c_usblib:add_libraries(tm4c_driverlib)
+
+local CONFIG_TEMPLATE = [[
+_G.CONFIG_TM4C_USBLIB = {
+    type = "host" / "device" / "both"
+}
+]]
+assert(_G.CONFIG_TM4C_USBLIB ~= nil, "_G.CONFIG_TM4C_USBLIB not defined\n"..CONFIG_TEMPLATE)
+
+tm4c_usblib:add_sources("./*.c")
+
+if _G.CONFIG_TM4C_USBLIB.type == "host" then
+    tm4c_usblib:add_sources("./host/*.c")
+elseif _G.CONFIG_TM4C_USBLIB.type == "device" then
+    tm4c_usblib:add_sources("./device/*.c")
+elseif _G.CONFIG_TM4C_USBLIB.type == "both" then
+    tm4c_usblib:add_sources("./host/*.c")
+    tm4c_usblib:add_sources("./device/*.c")
+else
+    assert(0, "Invalid _G.CONFIG_TM4C_USBLIB.type: ".._G.CONFIG_TM4C_USBLIB.type)
+end
