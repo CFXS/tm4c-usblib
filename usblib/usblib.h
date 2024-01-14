@@ -84,13 +84,9 @@ extern "C"
 // must be done explicitly.
 //
 //*****************************************************************************
-#if defined(ccs) ||                                                           \
-    defined(codered) ||                                                       \
-    defined(gcc) ||                                                           \
-    defined(rvmdk) ||                                                         \
-    defined(__ARMCC_VERSION) ||                                               \
+#if defined(ccs) || defined(codered) || defined(gcc) || defined(__clang__) || defined(rvmdk) || defined(__ARMCC_VERSION) || \
     defined(sourcerygxx)
-#define PACKED __attribute__ ((packed))
+    #define PACKED __attribute__((packed))
 #elif defined(ewarm)
 #define PACKED
 #else
