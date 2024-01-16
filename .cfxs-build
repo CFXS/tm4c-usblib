@@ -14,9 +14,8 @@ if _G.CFXS_TOOLCHAIN == "GCC" or _G.CFXS_TOOLCHAIN == "Clang" then
     tm4c_usblib:add_compile_options("private", {
         "-Wno-missing-field-initializers",
         "-Wno-unused-but-set-variable",
+        "-Wno-unused-parameter",
     })
-else
-    error("Toolchain [".._G.CFXS_TOOLCHAIN.."] not implemented")
 end
 
 assert(tm4c_driverlib ~= nil, "tm4c_driverlib not imported")
